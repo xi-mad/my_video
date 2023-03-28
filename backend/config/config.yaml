@@ -1,0 +1,13 @@
+app:
+  mode: "debug"
+
+sqlite:
+  path: "./data/my_video.db"
+
+thumbnail:
+  mtn: "D:/soft/mtn-200808a-win32/mtn.exe"
+  width: 2048
+  font: "C:/Windows/Fonts/STSONG.TTF"
+
+player:
+  path: "D:/soft/PotPlayer64/PotPlayerMini64.exe"

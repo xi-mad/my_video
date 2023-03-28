@@ -1,0 +1,55 @@
+import request from '../request'
+
+export const createObject = (data: any) => {
+    return request({
+        url: '/api/object/create',
+        method: 'post',
+        data
+    })
+}
+
+export const updateObject = (data: any) => {
+    return request({
+        url: '/api/object/update',
+        method: 'put',
+        data
+    })
+}
+
+export const deleteObject = (data: any) => {
+    return request({
+        url: '/api/object/delete',
+        method: 'delete',
+        data
+    })
+}
+
+export const listObject = (data: any) => {
+    return request({
+        url: '/api/object/list',
+        method: 'post',
+        data
+    })
+}
+
+export const scanObject = (data: any) => {
+    return request({
+        url: '/api/object/scan',
+        method: 'post',
+        data
+    })
+}
+
+export const playPath = (path: any) => {
+    return request({
+        url: '/api/object/play?path=' + path,
+        method: 'get'
+    })
+}
+
+export const log = () => {
+    return request({
+        url: '/api/object/log',
+        method: 'get'
+    })
+}

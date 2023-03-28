@@ -33,6 +33,8 @@ sqlite:
 thumbnail:
   mtn: "D:/soft/mtn-200808a-win32/mtn.exe" //mtn 工具路径，这个是创建缩略图的工具
   width: 2048 // 缩略图的宽
+  row: 6  // 每行几个缩略图
+  col: 6  // 每列几个缩略图
   font: "C:/Windows/Fonts/STSONG.TTF" // 电脑的中文字体，mtn要用，否则中文不显示
 
 player:

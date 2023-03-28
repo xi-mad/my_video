@@ -7,6 +7,8 @@ sqlite:
 thumbnail:
   mtn: "D:/soft/mtn-200808a-win32/mtn.exe"
   width: 2048
+  row: 6
+  col: 6
   font: "C:/Windows/Fonts/STSONG.TTF"
 
 player:

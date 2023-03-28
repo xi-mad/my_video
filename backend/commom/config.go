@@ -24,6 +24,8 @@ type Sqlite struct {
 type Thumbnail struct {
 	Mtn   string `yaml:"mtn"`
 	Width string `yaml:"width"`
+	Row   int    `yaml:"row"`
+	Col   int    `yaml:"col"`
 	Font  string `yaml:"font"`
 }
 

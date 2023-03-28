@@ -320,8 +320,15 @@ func thumbnail(path string, fsize int64) (err error) {
 	} else if fsize > 1024 {
 		col, row = 6, 6
 	}
-
 	thumbnailConf := commom.DefaultConfig.Thumbnail
+
+	if thumbnailConf.Row > 0 {
+		row = thumbnailConf.Row
+	}
+	if thumbnailConf.Col > 0 {
+		col = thumbnailConf.Col
+	}
+
 	args := []string{"-P", "-w", thumbnailConf.Width, "-c", fmt.Sprintf("%d", col), "-r", fmt.Sprintf("%d", row), "-f", thumbnailConf.Font, "-O", "./temp", path}
 	_, err = exec.Command(thumbnailConf.Mtn, args...).Output()
 	return

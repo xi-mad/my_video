@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xi-mad/my_video/commom"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -322,7 +321,6 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 	if row <= 0 {
 		row = 4
 	}
-	log.Println("fsize =", fsize, "width =", width, "col =", col, "row =", row)
 	args := []string{"-P",
 		"-w", fmt.Sprintf("%d", width),
 		"-c", fmt.Sprintf("%d", col),

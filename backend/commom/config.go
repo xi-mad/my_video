@@ -3,6 +3,7 @@ package commom
 import (
 	"log"
 	"os"
+	"sort"
 
 	"gopkg.in/yaml.v3"
 )
@@ -22,12 +23,25 @@ type Sqlite struct {
 }
 
 type Thumbnail struct {
-	Mtn   string `yaml:"mtn"`
-	Width string `yaml:"width"`
-	Row   int    `yaml:"row"`
-	Col   int    `yaml:"col"`
-	Font  string `yaml:"font"`
+	Mtn      string     `yaml:"mtn"`
+	Width    int        `yaml:"width"`
+	Row      int        `yaml:"row"`
+	Col      int        `yaml:"col"`
+	Optional []Optional `yaml:"optional"`
+	Font     string     `yaml:"font"`
 }
+
+type Optional struct {
+	FSizeLess int64 `yaml:"fsizeless"`
+	Width     int   `yaml:"width"`
+	Row       int   `yaml:"row"`
+	Col       int   `yaml:"col"`
+}
+type OptionalSlice []Optional
+
+func (o OptionalSlice) Len() int           { return len(o) }
+func (o OptionalSlice) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+func (o OptionalSlice) Less(i, j int) bool { return o[i].FSizeLess < o[j].FSizeLess }
 
 type Player struct {
 	Path string `yaml:"path"`
@@ -41,7 +55,7 @@ func NewConfig(path string) *Config {
 			Path: "./data/my_video.db",
 		},
 		Thumbnail: Thumbnail{
-			Width: "2048",
+			Width: 2048,
 		},
 	}
 	if content, err := os.ReadFile(path); err != nil {
@@ -59,6 +73,7 @@ func NewConfig(path string) *Config {
 	if config.Player.Path == "" {
 		log.Println("播放器路径未设置")
 	}
+	sort.Sort(OptionalSlice(config.Thumbnail.Optional))
 	log.Println(config)
 	return config
 }

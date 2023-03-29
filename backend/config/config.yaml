@@ -9,6 +9,24 @@ thumbnail:
   width: 2048
   row: 6
   col: 6
+  optional:
+    - fsizeless: 16
+      width: 1024
+      row: 3
+      col: 3
+    - fsizeless: 64
+      width: 2048
+      row: 4
+      col: 4
+    - fsizeless: 512
+      width: 2048
+      row: 5
+      col: 5
+    - fsizeless: 1024
+      width: 2048
+      row: 6
+      col: 6
+
   font: "C:/Windows/Fonts/STSONG.TTF"
 
 player:

@@ -8,10 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xi-mad/my_video/commom"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 func Register(router *gin.RouterGroup) {
@@ -270,19 +272,19 @@ func detail(path string) (fname, b64 string, err error) {
 		fname = fi.Name()
 		fsize = fi.Size() / 1024 / 1024
 	}
-	if err = thumbnail(path, fsize); err != nil {
+	suffix := fmt.Sprintf("%d", time.Now().UnixNano())
+	if err = thumbnail(path, fsize, suffix); err != nil {
 		return
 	}
-	if b64, err = thumbnailB64(fname); err != nil {
+	if b64, err = thumbnailB64(fname, suffix); err != nil {
 		return
 	}
 	return
 }
 
-func thumbnailB64(fname string) (b64 string, err error) {
-	suffix := path.Ext(fname)
-	prefix := fname[0 : len(fname)-len(suffix)]
-	if thumbPath, err := filepath.Abs("./temp/" + prefix + "_s.jpg"); err != nil {
+func thumbnailB64(fname, suffix string) (b64 string, err error) {
+	prefix := fname[0 : len(fname)-len(path.Ext(fname))]
+	if thumbPath, err := filepath.Abs("./temp/" + prefix + fmt.Sprintf("_%s.jpg", suffix)); err != nil {
 		return "", err
 	} else {
 		if f, err := os.Open(thumbPath); err != nil {
@@ -302,34 +304,33 @@ func thumbnailB64(fname string) (b64 string, err error) {
 	return
 }
 
-func thumbnail(path string, fsize int64) (err error) {
-	/*
-		<= 50MB 2 * 2
-		<= 100MB 3 * 3
-		<= 500MB 4 * 4
-		<= 1024MB 5 * 5
-		else 6 * 6
-	*/
-	col, row := 2, 2
-	if fsize > 50 {
-		col, row = 3, 3
-	} else if fsize > 100 {
-		col, row = 4, 4
-	} else if fsize > 500 {
-		col, row = 5, 5
-	} else if fsize > 1024 {
-		col, row = 6, 6
-	}
+func thumbnail(path string, fsize int64, suffix string) (err error) {
 	thumbnailConf := commom.DefaultConfig.Thumbnail
-
-	if thumbnailConf.Row > 0 {
-		row = thumbnailConf.Row
+	width, col, row := thumbnailConf.Width, thumbnailConf.Col, thumbnailConf.Row
+	for _, optional := range thumbnailConf.Optional {
+		if fsize <= optional.FSizeLess {
+			width, col, row = optional.Width, optional.Col, optional.Row
+			break
+		}
 	}
-	if thumbnailConf.Col > 0 {
-		col = thumbnailConf.Col
+	if width <= 0 {
+		width = 2048
 	}
-
-	args := []string{"-P", "-w", thumbnailConf.Width, "-c", fmt.Sprintf("%d", col), "-r", fmt.Sprintf("%d", row), "-f", thumbnailConf.Font, "-O", "./temp", path}
+	if col <= 0 {
+		col = 4
+	}
+	if row <= 0 {
+		row = 4
+	}
+	log.Println("fsize =", fsize, "width =", width, "col =", col, "row =", row)
+	args := []string{"-P",
+		"-w", fmt.Sprintf("%d", width),
+		"-c", fmt.Sprintf("%d", col),
+		"-r", fmt.Sprintf("%d", row),
+		"-f", thumbnailConf.Font,
+		"-o", fmt.Sprintf("_%s.jpg", suffix),
+		"-O", "./temp",
+		path}
 	_, err = exec.Command(thumbnailConf.Mtn, args...).Output()
 	return
 }

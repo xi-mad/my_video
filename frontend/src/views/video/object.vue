@@ -586,4 +586,8 @@ onMounted(() => {
     column-count: 5;
   }
 }
+textarea:disabled {
+  opacity: 1;
+  -webkit-text-fill-color: #000;
+}
 </style>

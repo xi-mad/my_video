@@ -35,6 +35,15 @@ thumbnail:
   width: 2048 // 缩略图的宽
   row: 6  // 每行几个缩略图
   col: 6  // 每列几个缩略图
+  optional:  // 现在你可以根据文件大小自定义缩略图的宽和个数了，会自动选择一个最接近的配置，如果不设置，就会使用上面的width、row、col
+    - fsizeless: 16
+      width: 1024
+      row: 3
+      col: 3
+    - fsizeless: 64
+      width: 2048
+      row: 4
+      col: 4
   font: "C:/Windows/Fonts/STSONG.TTF" // 电脑的中文字体，mtn要用，否则中文不显示
 
 player:

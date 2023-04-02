@@ -6,8 +6,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import { globalAxios } from './request'
+import vue3videoPlay from 'vue3-video-play'
+import 'vue3-video-play/dist/style.css'
 
 const app = createApp(App)
+
+app.use(vue3videoPlay)
 
 // 使用antd
 app.use(Antd)

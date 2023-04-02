@@ -53,3 +53,16 @@ export const log = () => {
         method: 'get'
     })
 }
+
+export const videoPath = (path: any) => {
+    return request.getUri({
+        url: '/api/object/video?path=' + path,
+    })
+}
+
+export const viewinc = (id: any) => {
+    return request({
+        url: '/api/object/viewinc?id=' + id,
+        method: 'get'
+    })
+}

@@ -15,6 +15,7 @@ type Object struct {
 	Path        string    `gorm:"path" json:"path"`
 	Magnet      string    `gorm:"magnet" json:"magnet"`
 	Ext         string    `gorm:"ext" json:"ext"`
+	ViewCount   int       `gorm:"view_count;default:0" json:"view_count"`
 	CreateTime  time.Time `gorm:"create_time;default:(datetime('now','localtime'))" json:"create_time"`
 }
 
@@ -97,6 +98,7 @@ type ListObjectModel struct {
 	Path        string    `json:"path"`
 	Magnet      string    `json:"magnet"`
 	Ext         string    `json:"ext"`
+	ViewCount   int       `json:"view_count"`
 	Actress     []int     `json:"actress"`
 	Tag         []int     `json:"tag"`
 	Tree        []int     `json:"tree"`

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xi-mad/my_video/commom"
+	"gorm.io/gorm"
 	"io"
 	"os"
 	"os/exec"
@@ -23,7 +24,8 @@ func Register(router *gin.RouterGroup) {
 	router.POST("/scan", ScanObject)
 	router.GET("/play", PlayObject)
 	router.GET("/log", LogObject)
-
+	router.GET("/video", VideoObject)
+	router.GET("/viewinc", ViewObjectInc)
 }
 
 var findLog = list.New()
@@ -37,6 +39,29 @@ func LogObject(c *gin.Context) {
 		findLog.Remove(front)
 	}
 	c.JSON(200, commom.CommonResultSuccess(msg))
+}
+
+func ViewObjectInc(c *gin.Context) {
+	if id, exist := c.GetQuery("id"); !exist {
+		c.JSON(200, commom.CommonResultFailed(errors.New("id is empty")))
+		return
+	} else {
+		if err := commom.DB.Model(&Object{}).Where("id = ?", id).Update("view_count", gorm.Expr("view_count + ?", 1)).Error; err != nil {
+			c.JSON(200, commom.CommonResultFailed(err))
+			return
+		}
+	}
+	c.JSON(200, commom.CommonResultSuccess(nil))
+	return
+}
+func VideoObject(c *gin.Context) {
+	var model PlayObjectModel
+	if err := c.ShouldBindQuery(&model); err != nil {
+		c.JSON(200, commom.CommonResultFailed(err))
+		return
+	}
+	c.File(model.Path)
+	return
 }
 
 func PlayObject(c *gin.Context) {
@@ -87,6 +112,7 @@ func ListObject(c *gin.Context) {
 			Path:        v.Path,
 			Magnet:      v.Magnet,
 			Ext:         v.Ext,
+			ViewCount:   v.ViewCount,
 			Actress:     []int{},
 			Tag:         []int{},
 			Tree:        []int{},

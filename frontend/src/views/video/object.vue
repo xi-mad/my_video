@@ -153,10 +153,17 @@
               <template v-for="(object, index) in objects" :key="index">
                 <li class="custom_card">
                   <a-image :src="'data:image/jpg;base64,' + object.thumbnail"/>
-                  <a-row>{{ object.path }}</a-row>
+                  <a-row style="margin-top: 5px">文件名：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.name }}</p></a-row>
+                  <a-row style="margin-top: 5px">路径：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.path }}</p></a-row>
+                  <a-row style="margin-top: 5px">
+                    观看次数：
+                    <a-tag color="cyan">
+                      {{ object.view_count }}
+                    </a-tag>
+                  </a-row>
                   <a-row style="margin-top: 5px">
                     演员：
-                    <a-tag v-for="(elem) in object.actress" style="margin-top: 2px" color="cyan">
+                    <a-tag v-for="(elem) in object.actress" style="margin-top: 2px" color="green">
                       {{ actressMap[elem] }}
                     </a-tag>
                   </a-row>
@@ -174,7 +181,12 @@
                   </a-row>
                   <a-row style="margin-top: 5px">
                     <a-button-group>
-                      <a-button size="small"  @click="play(object.path)">
+                      <a-button size="small"  @click="playInBrowser(object)">
+                        <template #icon>
+                          <PlayCircleOutlined />
+                        </template>
+                      </a-button>
+                      <a-button size="small"  @click="playInOS(object)">
                         <template #icon>
                           <PlaySquareOutlined/>
                         </template>
@@ -263,17 +275,48 @@
       </template>
       <a-textarea v-model:value="logValue" placeholder="扫描日志" disabled="" :rows="30" />
     </a-modal>
+
+    <a-modal v-model:visible="videoVisible" title="播放" @ok="" @cancel="stopPlay" width="1000px" :maskClosable="false" :keyboard="false">
+      <template #footer>
+        <a-button @click="stopPlay">关闭</a-button>
+      </template>
+      <div class="video-container">
+        <vue3VideoPlay ref="player" v-bind="options"/>
+      </div>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
-import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject} from "@/api/object";
-import {DeleteOutlined, EditOutlined, PlaySquareOutlined} from '@ant-design/icons-vue';
+import {onMounted, ref, reactive} from 'vue';
+import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc} from "@/api/object";
+import {DeleteOutlined, EditOutlined, PlaySquareOutlined, PlayCircleOutlined} from '@ant-design/icons-vue';
 import {message, TreeSelect} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
 import {optionsTree} from "@/api/tree";
+
+const videoVisible = ref<boolean>(false);
+const player = ref<any>();
+
+const options = reactive({
+  width: '100%', //播放器高度
+  height: '100%', //播放器高度
+  color: "#409eff", //主题色
+  title: '', //视频名称
+  src: "", //视频源
+  muted: false, //静音
+  webFullScreen: false,
+  poster: "", //封面图
+  speedRate: ["0.75", "1.0", "1.25", "1.5", "2.0"], //播放倍速
+  autoPlay: false, //自动播放
+  loop: false, //循环播放
+  mirror: false, //镜像画面
+  ligthOff: false,  //关灯模式
+  volume: 0.2, //默认音量大小
+  control: true, //是否显示控制
+  controlBtns:['audioTrack', 'quality', 'speedRate', 'volume', 'setting', 'pip', 'pageFullScreen', 'fullScreen'] //显示所有按钮,
+})
 
 const SHOW_ALL = TreeSelect.SHOW_ALL;
 
@@ -378,10 +421,24 @@ const submit = () => {
   }
 };
 
-const play = (record: any) => {
-  playPath(record).then(response => {
+const playInOS = (record: any) => {
+  playPath(record.path).then(response => {
     message.info("播放成功");
   });
+  viewinc(record.id).then(response => {});
+};
+
+const playInBrowser = (record: any) => {
+  videoVisible.value = true;
+  options.title = record.name;
+  options.poster = 'data:image/jpg;base64,' + record.thumbnail;
+  options.src = videoPath(record.path);
+  viewinc(record.id).then(response => {});
+};
+
+const stopPlay = () => {
+  videoVisible.value = false;
+  player.value.pause()
 };
 
 const updateRecord = (record: any) => {
@@ -528,8 +585,6 @@ const buildTree = (data: any[]) => {
 }
 
 onMounted(() => {
-  refresh();
-
   optionsActress().then((res) => {
     actressOptions.value = res.data.data;
     res.data.data.forEach((item: any) => {
@@ -548,6 +603,10 @@ onMounted(() => {
       treeMap[item.value] = item.label;
     });
   });
+
+  setTimeout(() => {
+    refresh();
+  }, 100);
 })
 
 </script>
@@ -570,24 +629,41 @@ onMounted(() => {
   .custom_container {
     column-count: 2;
   }
+  .video-container {
+    width: 320px;
+    height: 240px;
+  }
 }
 @media (min-width: 760px) and (max-width: 979.5px) {
   .custom_container {
     column-count: 3;
+  }
+  .video-container {
+    width: 720px;
+    height: 540px;
   }
 }
 @media (min-width: 980px) and (max-width: 1023.5px) {
   .custom_container {
     column-count: 4;
   }
+  .video-container {
+    width: 760px;
+    height: 570px;
+  }
 }
 @media (min-width: 1024px) {
   .custom_container {
     column-count: 5;
+  }
+  .video-container {
+    width: 960px;
+    height: 720px;
   }
 }
 textarea:disabled {
   opacity: 1;
   -webkit-text-fill-color: #000;
 }
+
 </style>

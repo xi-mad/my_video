@@ -16,6 +16,7 @@ type Config struct {
 }
 type App struct {
 	Mode string `yaml:"mode"`
+	Port string `yaml:"port"`
 }
 
 type Sqlite struct {

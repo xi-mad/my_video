@@ -32,7 +32,7 @@ func main() {
 	object.Register(api.Group("/object"))
 	actress.Register(api.Group("/actress"))
 
-	_ = r.Run()
+	_ = r.Run(":" + conf.DefaultConfig.App.Port)
 }
 
 func Mkdir() {

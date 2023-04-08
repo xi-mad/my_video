@@ -9,6 +9,7 @@
 - [ ] 记录日志，存入到log文件夹
 - [ ] 计算视频唯一码，但hashcode效率并不高，可能需要使用别的方案
 - [ ] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
+- [ ] 记录导入日志
 
 
 

@@ -4,7 +4,12 @@
 
 ---
 ### 下一步计划
-- [ ] 思考中
+- [ ] 配置移动到项目中 [issue #1](https://github.com/xi-mad/my_video/issues/1)
+- [ ] 将程序移动到任务栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
+- [ ] 记录日志，存入到log文件夹
+- [ ] 计算视频唯一码，但hashcode效率并不高，可能需要使用别的方案
+- [ ] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
+
 
 
 --- 

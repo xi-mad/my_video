@@ -74,6 +74,10 @@ func NewConfig(path string) *Config {
 	if config.Player.Path == "" {
 		log.Println("播放器路径未设置")
 	}
+	if config.App.Port == "" {
+		log.Println("端口未设置, 使用默认端口8080")
+		config.App.Port = "8080"
+	}
 	sort.Sort(OptionalSlice(config.Thumbnail.Optional))
 	log.Println(config)
 	return config

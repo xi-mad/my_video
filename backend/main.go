@@ -25,7 +25,6 @@ func main() {
 
 	conf.Load(conf.DefaultConfig.Sqlite.Path)
 	AutoMigrate()
-	object.Load()
 
 	r := gin.Default()
 

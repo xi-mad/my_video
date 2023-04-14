@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xi-mad/my_video/commom"
-	"github.com/xi-mad/my_video/util"
 	"gorm.io/gorm"
 	"io"
 	"log"
@@ -16,6 +15,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -32,16 +32,6 @@ func Register(router *gin.RouterGroup) {
 }
 
 var findLog = list.New()
-
-var existHash *util.Set
-
-func Load() {
-	hash, err := GetAllMd5()
-	if err != nil {
-		log.Fatal(err)
-	}
-	existHash = hash
-}
 
 func LogObject(c *gin.Context) {
 	l := findLog.Len()
@@ -165,14 +155,13 @@ func CreateObject(c *gin.Context) {
 
 func createObject(model CreateObjectModel) (object Object, err error) {
 	fname, b64, md5val, err := detail(model.Path)
-	if existHash.Has(md5val) {
-		err = errors.New("file exist")
-		return
-	} else {
-		existHash.Add(md5val)
-	}
 	if err != nil {
 		return
+	}
+	if exist, err := HashExist(md5val); err != nil {
+		return object, err
+	} else if exist {
+		return object, errors.New("file already exist")
 	}
 	object = Object{
 		Type:        model.Type,
@@ -212,11 +201,18 @@ func UpdateObject(c *gin.Context) {
 	var newMd5val string
 	if oldObj.Path != model.Path {
 		_, b64, md5val, err := detail(model.Path)
-		newMd5val = md5val
 		if err != nil {
 			c.JSON(200, commom.CommonResultFailed(err))
 			return
 		}
+		if exist, err := HashExist(md5val); err != nil {
+			c.JSON(200, commom.CommonResultFailed(err))
+			return
+		} else if exist {
+			c.JSON(200, commom.CommonResultFailed(errors.New("file already exist")))
+			return
+		}
+		newMd5val = md5val
 
 		thumb := Thumbnail{
 			ID:        oldObj.ID,
@@ -410,6 +406,8 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 		"-o", fmt.Sprintf("_%s.jpg", suffix),
 		"-O", "./temp",
 		path}
-	_, err = exec.Command(thumbnailConf.Mtn, args...).Output()
+	ins := exec.Command(thumbnailConf.Mtn, args...)
+	ins.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	_, err = ins.Output()
 	return
 }

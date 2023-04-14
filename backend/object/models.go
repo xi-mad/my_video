@@ -3,7 +3,6 @@ package object
 import (
 	"fmt"
 	"github.com/xi-mad/my_video/commom"
-	"github.com/xi-mad/my_video/util"
 	"gorm.io/gorm"
 	"time"
 )
@@ -292,14 +291,10 @@ func QueryTree(objectID []int) map[int][]int {
 	return res
 }
 
-func GetAllMd5() (*util.Set, error) {
-	var object = make([]Object, 0)
-	if err := commom.DB.Model(&Object{}).Select("md5_value").Find(&object).Error; err != nil {
-		return nil, err
+func HashExist(hash string) (bool, error) {
+	var count int64
+	if err := commom.DB.Model(&Object{}).Where("md5_value = ?", hash).Count(&count).Error; err != nil {
+		return false, err
 	}
-	res := util.NewSet()
-	for _, v := range object {
-		res.Add(v.Md5Value)
-	}
-	return res, nil
+	return count > 0, nil
 }

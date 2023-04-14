@@ -198,7 +198,14 @@ func UpdateObject(c *gin.Context) {
 		c.JSON(200, commom.CommonResultFailed(err))
 		return
 	}
-	var newMd5val string
+	object := Object{
+		ID:          model.ID,
+		Type:        model.Type,
+		Name:        model.Name,
+		Description: model.Description,
+		Path:        model.Path,
+		Magnet:      model.Magnet,
+	}
 	if oldObj.Path != model.Path {
 		_, b64, md5val, err := detail(model.Path)
 		if err != nil {
@@ -212,8 +219,7 @@ func UpdateObject(c *gin.Context) {
 			c.JSON(200, commom.CommonResultFailed(errors.New("file already exist")))
 			return
 		}
-		newMd5val = md5val
-
+		object.Md5Value = md5val
 		thumb := Thumbnail{
 			ID:        oldObj.ID,
 			Thumbnail: b64,
@@ -221,15 +227,6 @@ func UpdateObject(c *gin.Context) {
 		err = commom.DB.Updates(&thumb).Error
 	}
 
-	object := Object{
-		ID:          model.ID,
-		Type:        model.Type,
-		Name:        model.Name,
-		Md5Value:    newMd5val,
-		Description: model.Description,
-		Path:        model.Path,
-		Magnet:      model.Magnet,
-	}
 	err = commom.DB.Updates(&object).Error
 	SaveObjectActress(object.ID, model.Actress)
 	SaveObjectTag(object.ID, model.Tag)

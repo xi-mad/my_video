@@ -11,7 +11,7 @@ type Object struct {
 	ID          int       `gorm:"id;primaryKey;autoIncrement" json:"id"`
 	Type        string    `gorm:"type" json:"type"`
 	Name        string    `gorm:"name" json:"name"`
-	Md5Value    string    `gorm:"md5_value" json:"md5_value"`
+	Md5Value    string    `gorm:"md5_value;index:md5_index" json:"md5_value"`
 	Description string    `gorm:"description" json:"description"`
 	Path        string    `gorm:"path" json:"path"`
 	Magnet      string    `gorm:"magnet" json:"magnet"`

@@ -3,6 +3,7 @@ package object
 import (
 	"fmt"
 	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/util"
 	"gorm.io/gorm"
 	"time"
 )
@@ -11,6 +12,7 @@ type Object struct {
 	ID          int       `gorm:"id;primaryKey;autoIncrement" json:"id"`
 	Type        string    `gorm:"type" json:"type"`
 	Name        string    `gorm:"name" json:"name"`
+	Md5Value    string    `gorm:"md5_value" json:"md5_value"`
 	Description string    `gorm:"description" json:"description"`
 	Path        string    `gorm:"path" json:"path"`
 	Magnet      string    `gorm:"magnet" json:"magnet"`
@@ -94,6 +96,7 @@ type ListObjectModel struct {
 	ID          int       `json:"id"`
 	Type        string    `json:"type"`
 	Name        string    `json:"name"`
+	Md5Value    string    `json:"md5_value"`
 	Description string    `json:"description"`
 	Path        string    `json:"path"`
 	Magnet      string    `json:"magnet"`
@@ -287,4 +290,16 @@ func QueryTree(objectID []int) map[int][]int {
 		res[v.ObjectID] = append(res[v.ObjectID], v.TreeID)
 	}
 	return res
+}
+
+func GetAllMd5() (*util.Set, error) {
+	var object = make([]Object, 0)
+	if err := commom.DB.Model(&Object{}).Select("md5_value").Find(&object).Error; err != nil {
+		return nil, err
+	}
+	res := util.NewSet()
+	for _, v := range object {
+		res.Add(v.Md5Value)
+	}
+	return res, nil
 }

@@ -5,11 +5,9 @@
 ---
 ### 下一步计划
 - [ ] 配置移动到项目中 [issue #1](https://github.com/xi-mad/my_video/issues/1)
-- [ ] 将程序移动到任务栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
 - [ ] 记录日志，存入到log文件夹
-- [ ] 计算视频唯一码，但hashcode效率并不高，可能需要使用别的方案
 - [ ] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
-- [ ] 记录导入日志
+- [ ] 记录日志到文件
 
 
 
@@ -25,6 +23,8 @@
 - [x] 标签管理，自由发挥
 - [x] 支持在线播放
 - [x] 记录播放次数
+- [x] 将程序移动到任务栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
+- [x] 计算视频唯一码，最多取前50M计算hash值
 
 如果运行报错，请打开cmd 进到当前目录下，然后运行 ./my_video.exe， 把日志贴过来，方便排查
 
@@ -43,6 +43,7 @@ my_video.exe    主程序，运行后，在浏览器打开：http://127.0.0.1:80
 app:
   mode: "debug" // debug 模式可以看到SQL语句
   port: 8080 // 运行端口号
+  server-mode: false // 是否服务器模式，如果是服务器模式则会保留命令行输出，否则会将程序隐藏到任务栏
   
 sqlite:
   path: "./data/my_video.db"   // 数据库路径

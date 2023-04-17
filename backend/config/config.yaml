@@ -1,6 +1,7 @@
 app:
   mode: "debug"
   port: 8080
+  server-mode: false
 
 sqlite:
   path: "./data/my_video.db"

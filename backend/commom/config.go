@@ -15,8 +15,9 @@ type Config struct {
 	Player    Player    `yaml:"player"`
 }
 type App struct {
-	Mode string `yaml:"mode"`
-	Port string `yaml:"port"`
+	Mode       string `yaml:"mode"`
+	Port       string `yaml:"port"`
+	ServerMode bool   `yaml:"server-mode"`
 }
 
 type Sqlite struct {
@@ -77,6 +78,9 @@ func NewConfig(path string) *Config {
 	if config.App.Port == "" {
 		log.Println("端口未设置, 使用默认端口8080")
 		config.App.Port = "8080"
+	}
+	if config.App.ServerMode {
+		log.Println("服务端模式")
 	}
 	sort.Sort(OptionalSlice(config.Thumbnail.Optional))
 	log.Println(config)

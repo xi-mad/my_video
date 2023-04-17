@@ -16,12 +16,14 @@ import (
 )
 
 func main() {
-	go func() {
-		systray.Run(onReady, onExit)
-	}()
 	Mkdir()
 
 	conf.DefaultConfig = conf.NewConfig("./config/config.yaml")
+	if !conf.DefaultConfig.App.ServerMode {
+		go func() {
+			systray.Run(onReady, onExit)
+		}()
+	}
 
 	conf.Load(conf.DefaultConfig.Sqlite.Path)
 	AutoMigrate()

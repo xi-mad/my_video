@@ -7,7 +7,7 @@
 - [ ] 配置移动到项目中 [issue #1](https://github.com/xi-mad/my_video/issues/1)
 - [ ] 记录日志，存入到log文件夹
 - [ ] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
-- [ ] 记录日志到文件
+- [ ] 记录导入记录，提供更精细化的管理方式
 
 
 
@@ -43,7 +43,7 @@ my_video.exe    主程序，运行后，在浏览器打开：http://127.0.0.1:80
 app:
   mode: "debug" // debug 模式可以看到SQL语句
   port: 8080 // 运行端口号
-  server-mode: false // 是否服务器模式，如果是服务器模式则会保留命令行输出，否则会将程序隐藏到任务栏
+  server-mode: false // 是否服务器模式，如果是服务器模式则会保留命令行输出，否则会将程序隐藏到托盘栏
   
 sqlite:
   path: "./data/my_video.db"   // 数据库路径

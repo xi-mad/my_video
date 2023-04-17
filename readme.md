@@ -23,7 +23,7 @@
 - [x] 标签管理，自由发挥
 - [x] 支持在线播放
 - [x] 记录播放次数
-- [x] 将程序移动到任务栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
+- [x] 将程序移动到托盘栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
 - [x] 计算视频唯一码，最多取前50M计算hash值
 
 如果运行报错，请打开cmd 进到当前目录下，然后运行 ./my_video.exe， 把日志贴过来，方便排查

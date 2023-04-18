@@ -2,7 +2,6 @@ package object
 
 import (
 	"container/list"
-	"crypto/md5"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -10,7 +9,6 @@ import (
 	"github.com/xi-mad/my_video/commom"
 	"gorm.io/gorm"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -154,19 +152,14 @@ func CreateObject(c *gin.Context) {
 }
 
 func createObject(model CreateObjectModel) (object Object, err error) {
-	fname, b64, md5val, err := detail(model.Path)
+	fname, b64, err := detail(model.Path)
 	if err != nil {
 		return
 	}
-	if exist, err := HashExist(md5val); err != nil {
-		return object, err
-	} else if exist {
-		return object, errors.New("file already exist")
-	}
+
 	object = Object{
 		Type:        model.Type,
 		Name:        fname,
-		Md5Value:    md5val,
 		Description: model.Description,
 		Path:        model.Path,
 		Magnet:      model.Magnet,
@@ -207,19 +200,11 @@ func UpdateObject(c *gin.Context) {
 		Magnet:      model.Magnet,
 	}
 	if oldObj.Path != model.Path {
-		_, b64, md5val, err := detail(model.Path)
+		_, b64, err := detail(model.Path)
 		if err != nil {
 			c.JSON(200, commom.CommonResultFailed(err))
 			return
 		}
-		if exist, err := HashExist(md5val); err != nil {
-			c.JSON(200, commom.CommonResultFailed(err))
-			return
-		} else if exist {
-			c.JSON(200, commom.CommonResultFailed(errors.New("file already exist")))
-			return
-		}
-		object.Md5Value = md5val
 		thumb := Thumbnail{
 			ID:        oldObj.ID,
 			Thumbnail: b64,
@@ -304,20 +289,16 @@ func scanObject(model ScanObjectModel) {
 	findLog.PushBack("扫描完成。")
 }
 
-func detail(path string) (fname, b64, md5SumValue string, err error) {
+func detail(path string) (fname, b64 string, err error) {
 	if path, err = filepath.Abs(path); err != nil {
 		return
 	}
 	var fsize int64
 	if fi, err := os.Stat(path); err != nil || fi.IsDir() {
-		return "", "", "", errors.New("path is not a file")
+		return "", "", errors.New("path is not a file")
 	} else {
 		fname = fi.Name()
 		fsize = fi.Size() / 1024 / 1024
-	}
-
-	if md5SumValue, err = md5Sum(path, fsize); err != nil {
-		return
 	}
 
 	suffix := fmt.Sprintf("%d", time.Now().UnixNano())
@@ -328,31 +309,6 @@ func detail(path string) (fname, b64, md5SumValue string, err error) {
 		return
 	}
 	return
-}
-
-func md5Sum(filename string, fileSize int64) (string, error) {
-	// 打开文件
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	// 读取文件的前50M或全部内容
-	var fileBytes []byte
-	if fileSize <= 50*1024*1024 { // 小于等于50M，读取全部内容
-		if fileBytes, err = io.ReadAll(file); err != nil {
-			return "", err
-		}
-	} else { // 大于50M，只读取前50M内容
-		fileBytes = make([]byte, 50*1024*1024)
-		if _, err = file.ReadAt(fileBytes, 0); err != nil {
-			return "", err
-		}
-	}
-
-	hash := md5.Sum(fileBytes)
-	return fmt.Sprintf("%x", hash), nil
 }
 
 func thumbnailB64(fname, suffix string) (b64 string, err error) {

@@ -492,11 +492,6 @@ const columns = [
     key: 'name',
   },
   {
-    title: 'MD5',
-    dataIndex: 'md5_value',
-    key: 'md5_value',
-  },
-  {
     title: '描述',
     dataIndex: 'description',
     key: 'description',

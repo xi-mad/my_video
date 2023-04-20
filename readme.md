@@ -6,7 +6,6 @@
 ### 下一步计划
 - [ ] 配置移动到项目中 [issue #1](https://github.com/xi-mad/my_video/issues/1)
 - [ ] 记录日志，存入到log文件夹
-- [ ] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
 - [ ] 记录导入记录，提供更精细化的管理方式
 
 
@@ -24,7 +23,8 @@
 - [x] 支持在线播放
 - [x] 记录播放次数
 - [x] 将程序移动到托盘栏 [issue #1](https://github.com/xi-mad/my_video/issues/1)
-- [x] 计算视频唯一码，最多取前50M计算hash值
+- [x] 根据路径去重
+- [x] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
 
 如果运行报错，请打开cmd 进到当前目录下，然后运行 ./my_video.exe， 把日志贴过来，方便排查
 

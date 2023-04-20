@@ -2,8 +2,9 @@ package tag
 
 import (
 	"errors"
+	"github.com/samber/lo"
 	"github.com/xi-mad/my_video/commom"
-	"github.com/xi-mad/my_video/object"
+	"github.com/xi-mad/my_video/tag_object"
 	"strings"
 	"time"
 )
@@ -48,11 +49,38 @@ func createTag(model CreateTagModel) (err error) {
 	return
 }
 
+func CreateTags(tags []string) []int {
+	ids := make([]int, 0)
+	exists := make([]Tag, 0)
+	commom.DB.Model(&Tag{}).Where("name in ?", tags).Find(&exists)
+	existMap := lo.Associate(exists, func(f Tag) (string, int) {
+		return f.Name, f.ID
+	})
+	notExists := make([]Tag, 0)
+	for _, tag := range tags {
+		if id, ok := existMap[tag]; ok {
+			ids = append(ids, id)
+		} else {
+			notExists = append(notExists, Tag{
+				Name:  tag,
+				Order: 0,
+			})
+		}
+	}
+	if len(notExists) > 0 {
+		commom.DB.Create(&notExists)
+		for _, tag := range notExists {
+			ids = append(ids, tag.ID)
+		}
+	}
+	return ids
+}
+
 func deleteTag(model DeleteTagModel) (err error) {
 	if err = commom.DB.Delete(&Tag{}, model.ID).Error; err != nil {
 		return err
 	}
-	if err = commom.DB.Delete(&object.TagObject{}, "tag_id in ?", model.ID).Error; err != nil {
+	if err = commom.DB.Delete(&tag_object.TagObject{}, "tag_id in ?", model.ID).Error; err != nil {
 		return err
 	}
 	return

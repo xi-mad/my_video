@@ -4,3 +4,4 @@ backend/data
 my_video.exe
 *.rar
 backend/build.bat
+backend/temp

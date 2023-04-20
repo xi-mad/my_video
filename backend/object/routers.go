@@ -3,16 +3,25 @@ package object
 import (
 	"container/list"
 	"encoding/base64"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/samber/lo"
+	"github.com/xi-mad/my_video/actress"
+	"github.com/xi-mad/my_video/actress_object"
 	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/media"
+	"github.com/xi-mad/my_video/tag"
+	"github.com/xi-mad/my_video/tag_object"
+	"github.com/xi-mad/my_video/util"
 	"gorm.io/gorm"
 	"io"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -107,12 +116,16 @@ func ListObject(c *gin.Context) {
 	for _, v := range object {
 		lom := ListObjectModel{
 			ID:          v.ID,
+			Num:         v.Num,
 			Type:        v.Type,
 			Name:        v.Name,
 			Description: v.Description,
 			Md5Value:    v.Md5Value,
 			Path:        v.Path,
 			Magnet:      v.Magnet,
+			ExistNFO:    v.ExistNFO,
+			Release:     v.Release,
+			Label:       v.Label,
 			Ext:         v.Ext,
 			ViewCount:   v.ViewCount,
 			Actress:     []int{},
@@ -120,7 +133,10 @@ func ListObject(c *gin.Context) {
 			Tree:        []int{},
 			CreateTime:  v.CreateTime,
 		}
-		lom.Thumbnail = thumbMap[v.ID]
+		lom.Thumbnail = thumbMap[v.ID].Thumbnail
+		lom.Fanart = thumbMap[v.ID].Fanart
+		lom.Thumb = thumbMap[v.ID].Thumb
+		lom.Poster = thumbMap[v.ID].Poster
 		if len(actress[v.ID]) > 0 {
 			lom.Actress = actress[v.ID]
 		}
@@ -152,6 +168,11 @@ func CreateObject(c *gin.Context) {
 }
 
 func createObject(model CreateObjectModel) (object Object, err error) {
+	if exist, err := PathExist(model.Path); err != nil {
+		return object, err
+	} else if exist {
+		return object, errors.New("file already exist")
+	}
 	fname, b64, err := detail(model.Path)
 	if err != nil {
 		return
@@ -163,6 +184,10 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 		Description: model.Description,
 		Path:        model.Path,
 		Magnet:      model.Magnet,
+		Num:         model.Num,
+		ExistNFO:    model.ExistNFO,
+		Release:     model.Release,
+		Label:       model.Label,
 	}
 	err = commom.DB.Save(&object).Error
 	if err != nil {
@@ -230,8 +255,8 @@ func DeleteObject(c *gin.Context) {
 		c.JSON(200, commom.CommonResultFailed(err))
 		return
 	}
-	deleteRelationByObjectID(model.ID, &ActressObject{})
-	deleteRelationByObjectID(model.ID, &TagObject{})
+	deleteRelationByObjectID(model.ID, &actress_object.ActressObject{})
+	deleteRelationByObjectID(model.ID, &tag_object.TagObject{})
 	deleteRelationByObjectID(model.ID, &TreeObject{})
 
 	err = commom.DB.Where("object_id in ?", model.ID).Delete(&Thumbnail{}).Error
@@ -258,26 +283,85 @@ func scanObject(model ScanObjectModel) {
 	var supportExt = []string{".mp4", ".avi", ".mkv", ".wmv", ".rmvb", ".flv", ".mov", ".mpg", ".mpeg", ".rm", ".asf", ".divx", ".vob", ".m4v", ".3gp", ".3g2", ".dat", ".m2ts", ".m2v", ".m4a", ".mj2", ".mjpg", ".mjpeg", ".moov", ".mpv", ".nut", ".ogg", ".ogm", ".qt", ".swf", ".ts", ".xvid"}
 
 	errMsgFormat := "path: %s, error: %s"
-	if err := filepath.Walk(model.Path, func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(model.Path, func(fpath string, info os.FileInfo, err error) error {
 		if err != nil {
-			findLog.PushBack(fmt.Sprintf(errMsgFormat, path, err.Error()))
+			findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))
 			return nil
 		}
 		if info.IsDir() {
 			return nil
 		}
-		ext := filepath.Ext(path)
+		ext := filepath.Ext(fpath)
 		for _, v := range supportExt {
 			if v == ext {
-				findLog.PushBack(fmt.Sprintf("find file: %s", path))
-				_, err := createObject(CreateObjectModel{
-					Path:    path,
-					Actress: model.Actress,
-					Tag:     model.Tag,
-					Tree:    model.Tree,
-				})
-				if err != nil {
-					findLog.PushBack(fmt.Sprintf(errMsgFormat, path, err.Error()))
+				findLog.PushBack(fmt.Sprintf("find file: %s", fpath))
+				filePrefix := fpath[0 : len(path.Base(fpath))-len(path.Ext(fpath))]
+				nfo := filePrefix + ".nfo"
+				if _, err := os.Stat(nfo); err == nil {
+					findLog.PushBack(fmt.Sprintf("find nfo: %s", nfo))
+					b, err := os.ReadFile(nfo)
+					if err != nil {
+						findLog.PushBack(fmt.Sprintf("open nfo: %s, faild: %s", nfo, err))
+						continue
+					}
+					m := media.NFO{}
+					if err := xml.Unmarshal(b, &m); err != nil {
+						findLog.PushBack(fmt.Sprintf("parse nfo: %s, faild: %s", nfo, err))
+						continue
+					}
+					tags := lo.Map(m.Tag, func(x media.Inner, index int) string {
+						return x.Inner
+					})
+					actors := lo.Map(m.Actor, func(x media.Actor, index int) string {
+						return x.Name
+					})
+					tagsId := tag.CreateTags(tags)
+					actorsId := actress.CreateActresses(actors)
+
+					obj, err := createObject(CreateObjectModel{
+						Path:        fpath,
+						Actress:     actorsId,
+						Tag:         tagsId,
+						ExistNFO:    true,
+						Description: strings.ReplaceAll(m.Plot.Inner, " ", ""),
+						Name:        strings.ReplaceAll(m.Title.Inner, " ", ""),
+						Num:         m.Number,
+						Release:     m.Release,
+						Label:       m.Label,
+					})
+					if err != nil {
+						findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))
+						continue
+					}
+					dir := filepath.Dir(fpath)
+					fanart := dir + "\\fanart.jpg"
+					poster := dir + "\\poster.jpg"
+					thumb := dir + "\\thumb.jpg"
+					fanartB64, err := util.Image2Base64(fanart)
+					if err == nil {
+						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+							Update("fanart", fanartB64)
+					}
+					posterB64, err := util.Image2Base64(poster)
+					if err == nil {
+						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+							Update("poster", posterB64)
+					}
+					thumbB64, err := util.Image2Base64(thumb)
+					if err == nil {
+						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+							Update("thumb", thumbB64)
+					}
+				} else {
+					_, err := createObject(CreateObjectModel{
+						Path:    fpath,
+						Actress: model.Actress,
+						Tag:     model.Tag,
+						Tree:    model.Tree,
+					})
+					if err != nil {
+						findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))
+					}
 				}
 				break
 			}

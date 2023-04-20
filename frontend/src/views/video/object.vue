@@ -46,12 +46,27 @@
               </a-tag>
             </template>
           </a-tree-select>
+
+        </a-form-item>
+        <a-form-item label="带有NFO">
+          <a-switch v-model:checked="searchValue.nfo"/>
         </a-form-item>
 
         <a-form-item>
           <a-button type="primary" @click="() => {refresh()}" >搜索</a-button>
         </a-form-item>
       </a-form>
+      <a-divider/>
+      <a-form-item label="显示">
+        <a-space direction="vertical">
+          <a-radio-group v-model:value="showImage" :options="[
+            { label: '默认', value: 'thumbnail' },
+            { label: 'fanart', value: 'fanart' },
+            { label: 'poster', value: 'poster' },
+            { label: 'thumb', value: 'thumb' },
+          ]" />
+        </a-space>
+      </a-form-item>
       <a-divider/>
       <a-button-group>
         <a-button type="primary" @click="create">新建对象</a-button>
@@ -122,11 +137,29 @@
                  :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" rowKey="id" :columns="columns" :pagination="false">
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.dataIndex === 'thumbnail'">
-              <a-image
+              <a-image v-if="record.exist_nfo && showImage === 'thumb'"
+                  :src="'data:image/jpg;base64,' + record.thumb"
+                  :alt="record.name"
+                  :width="100"
+              />
+              <a-image v-if="record.exist_nfo && showImage === 'poster'"
+                  :src="'data:image/jpg;base64,' + record.poster"
+                  :alt="record.name"
+                  :width="100"
+              />
+              <a-image v-if="record.exist_nfo && showImage === 'fanart'"
+                  :src="'data:image/jpg;base64,' + record.fanart"
+                  :alt="record.name"
+                  :width="100"
+              />
+              <a-image v-if="!record.exist_nfo || showImage === 'thumbnail'"
                   :src="'data:image/jpg;base64,' + record.thumbnail"
                   :alt="record.name"
                   :width="100"
               />
+            </template>
+            <template v-else-if="column.dataIndex === 'description'">
+              <a href="#" :title="record.description">{{record.description.substring(0, 20)}}</a>
             </template>
             <template v-else-if="column.dataIndex === 'action'">
               <a-button size="small" type="primary" @click="updateRecord(record)">
@@ -152,7 +185,11 @@
             <ul class="custom_container">
               <template v-for="(object, index) in objects" :key="index">
                 <li class="custom_card">
-                  <a-image :src="'data:image/jpg;base64,' + object.thumbnail"/>
+                  <a-image v-if="object.exist_nfo && showImage === 'thumb'" :src="'data:image/jpg;base64,' + object.thumb"/>
+                  <a-image v-if="object.exist_nfo && showImage === 'poster'" :src="'data:image/jpg;base64,' + object.poster"/>
+                  <a-image v-if="object.exist_nfo && showImage === 'fanart'" :src="'data:image/jpg;base64,' + object.fanart"/>
+                  <a-image v-if="!object.exist_nfo || showImage === 'thumbnail'" :src="'data:image/jpg;base64,' + object.thumbnail"/>
+
                   <a-row style="margin-top: 5px">文件名：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.name }}</p></a-row>
                   <a-row style="margin-top: 5px">路径：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.path }}</p></a-row>
                   <a-row style="margin-top: 5px">
@@ -295,6 +332,8 @@ import {message, TreeSelect} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
 import {optionsTree} from "@/api/tree";
+
+const showImage = ref<string>("thumbnail");
 
 const videoVisible = ref<boolean>(false);
 const player = ref<any>();
@@ -482,9 +521,19 @@ const onSelectChange = (rowKeys: any[]) => {
 
 const columns = [
   {
-    title: 'id',
-    dataIndex: 'id',
-    key: 'id',
+    title: '编号',
+    dataIndex: 'num',
+    key: 'num',
+  },
+  {
+    title: '发布日',
+    dataIndex: 'release',
+    key: 'release',
+  },
+  {
+    title: '标签',
+    dataIndex: 'label',
+    key: 'label',
   },
   {
     title: '名称',
@@ -549,6 +598,7 @@ const searchValue = ref<any>({
   actress: [],
   tag: [],
   tree: [],
+  nfo: false,
 });
 
 const refresh = () => {
@@ -559,6 +609,7 @@ const refresh = () => {
     actress: searchValue.value.actress,
     tag: searchValue.value.tag,
     tree: searchValue.value.tree,
+    nfo: searchValue.value.nfo,
   };
   listObject(data).then((res) => {
     objects.value = res.data.data.data;

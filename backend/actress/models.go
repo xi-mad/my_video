@@ -2,8 +2,9 @@ package actress
 
 import (
 	"errors"
+	"github.com/samber/lo"
+	"github.com/xi-mad/my_video/actress_object"
 	"github.com/xi-mad/my_video/commom"
-	"github.com/xi-mad/my_video/object"
 	"strings"
 	"time"
 )
@@ -52,11 +53,38 @@ func createActress(model CreateActressModel) (err error) {
 	return
 }
 
+func CreateActresses(actresses []string) []int {
+	ids := make([]int, 0)
+	exists := make([]Actress, 0)
+	commom.DB.Model(&Actress{}).Where("name in ?", actresses).Find(&exists)
+	existMap := lo.Associate(exists, func(f Actress) (string, int) {
+		return f.Name, f.ID
+	})
+	notExists := make([]Actress, 0)
+	for _, actress := range actresses {
+		if id, ok := existMap[actress]; ok {
+			ids = append(ids, id)
+		} else {
+			notExists = append(notExists, Actress{
+				Name:  actress,
+				Order: 0,
+			})
+		}
+	}
+	if len(notExists) > 0 {
+		commom.DB.Create(&notExists)
+		for _, actress := range notExists {
+			ids = append(ids, actress.ID)
+		}
+	}
+	return ids
+}
+
 func deleteActress(model DeleteActressModel) (err error) {
 	if err = commom.DB.Delete(&Actress{}, model.ID).Error; err != nil {
 		return err
 	}
-	if err = commom.DB.Delete(&object.ActressObject{}, "actress_id in ?", model.ID).Error; err != nil {
+	if err = commom.DB.Delete(&actress_object.ActressObject{}, "actress_id in ?", model.ID).Error; err != nil {
 		return err
 	}
 	return

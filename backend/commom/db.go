@@ -1,13 +1,14 @@
 package commom
 
 import (
-	log2 "log"
-	"os"
-	"path/filepath"
-
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 var DB *gorm.DB
@@ -24,12 +25,14 @@ func Load(file string) {
 			}
 		}
 	}
-	log := logger.Warn
-	if DefaultConfig.App.Mode == "debug" {
-		log = logger.Info
-	}
+
 	if db, err := gorm.Open(sqlite.Open(file+"?mode=wal"), &gorm.Config{
-		Logger: logger.Default.LogMode(log),
+		Logger: logger.New(log.New(io.MultiWriter(Logfile, os.Stdout), "\r\n", log.LstdFlags), logger.Config{
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  logLevel(),
+			IgnoreRecordNotFoundError: false,
+			Colorful:                  false,
+		}),
 	}); err != nil {
 		if err != nil {
 			panic("failed to connect database")
@@ -37,10 +40,18 @@ func Load(file string) {
 	} else {
 		DB = db
 		if sqlDB, err := db.DB(); err != nil {
-			log2.Fatal(err)
+			log.Fatal(err)
 		} else {
 			sqlDB.SetMaxOpenConns(1)
 		}
 	}
 
+}
+
+func logLevel() logger.LogLevel {
+	logLevel := logger.Warn
+	if DefaultConfig.App.Mode == "debug" {
+		logLevel = logger.Info
+	}
+	return logLevel
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/xi-mad/my_video/actress"
 	conf "github.com/xi-mad/my_video/commom"
 	"github.com/xi-mad/my_video/object"
+	"github.com/xi-mad/my_video/plantform"
 	"github.com/xi-mad/my_video/tag"
 	"github.com/xi-mad/my_video/tree"
 	"github.com/xi-mad/my_video/user"
@@ -14,7 +15,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"syscall"
 )
 
 func main() {
@@ -99,7 +99,7 @@ func onReady() {
 
 func openInBrowser() {
 	cmd := exec.Command("cmd", `/c`, `start`, "http://127.0.0.1:"+conf.DefaultConfig.App.Port)
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	plantform.PrepareBackgroundCommand(cmd)
 	if err := cmd.Start(); err != nil {
 		log.Println(err)
 	}

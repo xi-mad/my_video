@@ -12,6 +12,7 @@ import (
 	"github.com/xi-mad/my_video/actress_object"
 	"github.com/xi-mad/my_video/commom"
 	"github.com/xi-mad/my_video/media"
+	"github.com/xi-mad/my_video/plantform"
 	"github.com/xi-mad/my_video/tag"
 	"github.com/xi-mad/my_video/tag_object"
 	"github.com/xi-mad/my_video/util"
@@ -23,7 +24,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -446,7 +446,7 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 		"-O", "./temp",
 		path}
 	ins := exec.Command(thumbnailConf.Mtn, args...)
-	ins.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	plantform.PrepareBackgroundCommand(ins)
 	out, err := ins.Output()
 	if err != nil {
 		log.Printf("mtn error: %s, %s \n", err, string(out))

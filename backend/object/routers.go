@@ -17,6 +17,7 @@ import (
 	"github.com/xi-mad/my_video/util"
 	"gorm.io/gorm"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -446,6 +447,11 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 		path}
 	ins := exec.Command(thumbnailConf.Mtn, args...)
 	ins.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	_, err = ins.Output()
+	out, err := ins.Output()
+	if err != nil {
+		log.Printf("mtn error: %s, %s \n", err, string(out))
+	} else {
+		log.Printf("mtn success: %s, %s ", path, string(out))
+	}
 	return
 }

@@ -16,9 +16,11 @@ var DB *gorm.DB
 func Load(file string) {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		if absPath, err := filepath.Abs(file); err != nil {
+			log.Println(err)
 			panic(err)
 		} else {
 			if f, err := os.Create(absPath); err != nil {
+				log.Println(err)
 				panic(err)
 			} else {
 				_ = f.Close()
@@ -35,6 +37,7 @@ func Load(file string) {
 		}),
 	}); err != nil {
 		if err != nil {
+			log.Println(err)
 			panic("failed to connect database")
 		}
 	} else {

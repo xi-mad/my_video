@@ -65,6 +65,7 @@ func NewConfig(path string) *Config {
 	} else {
 		err = yaml.Unmarshal(content, config)
 		if err != nil {
+			log.Println(err)
 			panic(err)
 		}
 	}

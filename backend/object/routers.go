@@ -328,6 +328,7 @@ func scanObject(model ScanObjectModel) {
 						Num:         m.Number,
 						Release:     m.Release,
 						Label:       m.Label,
+						Rating:      m.Rating,
 					})
 					if err != nil {
 						findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))

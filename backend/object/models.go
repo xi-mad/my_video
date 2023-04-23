@@ -18,6 +18,7 @@ type Object struct {
 	Description string    `gorm:"description" json:"description"`
 	Path        string    `gorm:"path" json:"path"`
 	ExistNFO    bool      `gorm:"exist_nfo" json:"exist_nfo"`
+	Rating      string    `gorm:"rating" json:"rating"`
 	Release     string    `gorm:"release" json:"release"`
 	Label       string    `gorm:"label" json:"label"`
 	Magnet      string    `gorm:"magnet" json:"magnet"`
@@ -113,6 +114,7 @@ type ListObjectModel struct {
 	Path        string    `json:"path"`
 	Magnet      string    `json:"magnet"`
 	ExistNFO    bool      `json:"exist_nfo"`
+	Rating      string    `json:"rating"`
 	Release     string    `json:"release"`
 	Label       string    `json:"label"`
 	Ext         string    `json:"ext"`
@@ -134,6 +136,7 @@ type CreateObjectModel struct {
 	Description string `json:"description"`
 	Path        string `json:"path"`
 	ExistNFO    bool   `json:"exist_nfo"`
+	Rating      string `json:"rating"`
 	Release     string `json:"release"`
 	Label       string `json:"label"`
 	Magnet      string `json:"magnet"`
@@ -149,6 +152,7 @@ type UpdateObjectModel struct {
 	Description string `json:"description"`
 	Path        string `json:"path"`
 	ExistNFO    bool   `json:"exist_nfo"`
+	Rating      string `json:"rating"`
 	Magnet      string `json:"magnet"`
 	Actress     []int  `json:"actress"`
 	Tag         []int  `json:"tag"`

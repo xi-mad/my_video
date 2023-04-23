@@ -11,6 +11,7 @@ type NFO struct {
 	Label   string   `xml:"label"`
 	Actor   []Actor  `xml:"actor"`
 	Tag     []Inner  `xml:"tag"`
+	Rating  string   `xml:"rating"`
 }
 
 type Inner struct {

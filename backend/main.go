@@ -14,7 +14,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 )
 
 func main() {
@@ -77,17 +76,10 @@ func onReady() {
 			select {
 			case <-logFolder.ClickedCh:
 				dir, _ := os.Getwd()
-				_, err := exec.Command("explorer.exe", dir+"\\log").Output()
-				if err != nil {
-					log.Println(err)
-				}
-
+				_ = plantform.OpenFolder(dir + "\\log")
 			case <-configFolder.ClickedCh:
 				dir, _ := os.Getwd()
-				_, err := exec.Command("explorer.exe", dir+"\\config").Output()
-				if err != nil {
-					log.Println(err)
-				}
+				_ = plantform.OpenFolder(dir + "\\config")
 			case <-webPage.ClickedCh:
 				openInBrowser()
 			case <-mQuit.ClickedCh:
@@ -98,9 +90,8 @@ func onReady() {
 }
 
 func openInBrowser() {
-	cmd := exec.Command("cmd", `/c`, `start`, "http://127.0.0.1:"+conf.DefaultConfig.App.Port)
-	plantform.PrepareBackgroundCommand(cmd)
-	if err := cmd.Start(); err != nil {
+	err := plantform.OpenInBrowser("http://127.0.0.1:" + conf.DefaultConfig.App.Port)
+	if err != nil {
 		log.Println(err)
 	}
 }

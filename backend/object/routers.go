@@ -12,7 +12,6 @@ import (
 	"github.com/xi-mad/my_video/actress_object"
 	"github.com/xi-mad/my_video/commom"
 	"github.com/xi-mad/my_video/media"
-	"github.com/xi-mad/my_video/plantform"
 	"github.com/xi-mad/my_video/tag"
 	"github.com/xi-mad/my_video/tag_object"
 	"github.com/xi-mad/my_video/util"
@@ -20,7 +19,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -86,8 +84,8 @@ func PlayObject(c *gin.Context) {
 		c.JSON(200, commom.CommonResultFailed(errors.New("player not set")))
 		return
 	}
-	exec.Command(commom.DefaultConfig.Player.Path, model.Path).Start()
-	c.JSON(200, commom.CommonResultSuccess(nil))
+	err := util.ExecCmd(commom.DefaultConfig.Player.Path, model.Path)
+	c.JSON(200, commom.CommonResultAuto(nil, err))
 }
 
 func ListObject(c *gin.Context) {
@@ -111,7 +109,7 @@ func ListObject(c *gin.Context) {
 	}
 	trees := QueryTree(ids)
 	tags := QueryTags(ids)
-	actress := QueryActress(ids)
+	actressMap := QueryActress(ids)
 
 	var result []ListObjectModel
 	for _, v := range object {
@@ -138,8 +136,8 @@ func ListObject(c *gin.Context) {
 		lom.Fanart = thumbMap[v.ID].Fanart
 		lom.Thumb = thumbMap[v.ID].Thumb
 		lom.Poster = thumbMap[v.ID].Poster
-		if len(actress[v.ID]) > 0 {
-			lom.Actress = actress[v.ID]
+		if len(actressMap[v.ID]) > 0 {
+			lom.Actress = actressMap[v.ID]
 		}
 		if len(tags[v.ID]) > 0 {
 			lom.Tag = tags[v.ID]
@@ -172,7 +170,7 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 	if exist, err := PathExist(model.Path); err != nil {
 		return object, err
 	} else if exist {
-		return object, errors.New("file already exist")
+		return object, errors.New("file already exist, skipped")
 	}
 	fname, b64, err := detail(model.Path)
 	if err != nil {
@@ -445,13 +443,9 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 		"-o", fmt.Sprintf("_%s.jpg", suffix),
 		"-O", "./temp",
 		path}
-	ins := exec.Command(thumbnailConf.Mtn, args...)
-	plantform.PrepareBackgroundCommand(ins)
-	out, err := ins.Output()
+	err = util.ExecCmd(thumbnailConf.Mtn, args...)
 	if err != nil {
-		log.Printf("mtn error: %s, %s \n", err, string(out))
-	} else {
-		log.Printf("mtn success: %s, %s ", path, string(out))
+		log.Printf("mtn error: %s \n", err)
 	}
 	return
 }

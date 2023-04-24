@@ -83,6 +83,7 @@ func onReady() {
 			case <-webPage.ClickedCh:
 				openInBrowser()
 			case <-mQuit.ClickedCh:
+				systray.Quit()
 				os.Exit(0)
 			}
 		}

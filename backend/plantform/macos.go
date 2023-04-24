@@ -1,4 +1,4 @@
-//go:build macOS
+//go:build darwin
 
 package plantform
 

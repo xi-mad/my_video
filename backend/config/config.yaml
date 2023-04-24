@@ -8,7 +8,7 @@ sqlite:
 
 thumbnail:
   mtn: "D:/soft/mtn-200808a-win32/mtn.exe"
-  # mtn: "/opt/homebrew/bin/mtn" # macos
+#  mtn: "/opt/homebrew/bin/mtn" # macos
   width: 2048
   row: 6
   col: 6
@@ -31,7 +31,8 @@ thumbnail:
       col: 6
 
   font: "C:/Windows/Fonts/STSONG.TTF"
-  #font: "/Library/Fonts/Arial Unicode.ttf" # macos
+#  font: "/Library/Fonts/Arial Unicode.ttf" # macos
 
 player:
   path: "D:/soft/PotPlayer64/PotPlayerMini64.exe"
+#  path: "open" # macos

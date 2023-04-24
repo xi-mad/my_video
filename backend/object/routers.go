@@ -294,7 +294,7 @@ func scanObject(model ScanObjectModel) {
 		for _, v := range supportExt {
 			if v == ext {
 				findLog.PushBack(fmt.Sprintf("find file: %s", fpath))
-				filePrefix := fpath[0 : len(path.Base(fpath))-len(path.Ext(fpath))]
+				filePrefix := fpath[0 : len(fpath)-len(path.Ext(fpath))]
 				nfo := filePrefix + ".nfo"
 				if _, err := os.Stat(nfo); err == nil {
 					findLog.PushBack(fmt.Sprintf("find nfo: %s", nfo))

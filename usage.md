@@ -31,7 +31,7 @@ thumbnail:
 安装[mtn](https://gitlab.com/movie_thumbnailer/mtn/-/wikis/home#macos)，这个是生成缩略图的工具  
 需要使用[Homebrew](https://brew.sh/)安装
 
-安装Homebrew和mtn可能需要使用代理，并且耗时比较长
+安装Homebrew和mtn可能需要使用代理，并且耗时比较长。这两个软件安装较为复杂，不建议没有经验的用户使用macos版本  
 可以使用如下命令设置bash的代理，并注意修改端口号，前提是有代理软件在运行
 ```
  export no_proxy="localhost,127.0.0.1,localaddress,.localdomain.com"

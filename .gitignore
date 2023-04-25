@@ -7,3 +7,4 @@ backend/build.bat
 backend/temp
 backend/log
 backend/my_video
+backend/*.zip

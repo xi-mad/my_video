@@ -21,6 +21,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -316,6 +317,10 @@ func scanObject(model ScanObjectModel) {
 					})
 					tagsId := tag.CreateTags(tags)
 					actorsId := actress.CreateActresses(actors)
+					rating, err := strconv.ParseFloat(m.Rating, 64)
+					if err != nil {
+						rating = 0
+					}
 
 					obj, err := createObject(CreateObjectModel{
 						Path:        fpath,
@@ -327,7 +332,7 @@ func scanObject(model ScanObjectModel) {
 						Num:         m.Number,
 						Release:     m.Release,
 						Label:       m.Label,
-						Rating:      m.Rating,
+						Rating:      rating,
 					})
 					if err != nil {
 						findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))

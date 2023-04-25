@@ -1,14 +1,29 @@
 package object
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"github.com/xi-mad/my_video/actress_object"
 	"github.com/xi-mad/my_video/commom"
 	"github.com/xi-mad/my_video/tag_object"
 	"gorm.io/gorm"
-	"reflect"
+	"strconv"
 	"time"
 )
+
+type RateScore float64
+
+func (r *RateScore) Scan(value interface{}) error {
+	val, err := strconv.ParseFloat(fmt.Sprintf("%v", value), 64)
+	if err != nil {
+		*r = RateScore(0)
+	}
+	*r = RateScore(val)
+	return nil
+}
+func (r *RateScore) Value() (driver.Value, error) {
+	return float64(*r), nil
+}
 
 type Object struct {
 	ID          int       `gorm:"id;primaryKey;autoIncrement" json:"id"`
@@ -19,7 +34,7 @@ type Object struct {
 	Description string    `gorm:"description" json:"description"`
 	Path        string    `gorm:"path" json:"path"`
 	ExistNFO    bool      `gorm:"exist_nfo" json:"exist_nfo"`
-	Rating      string    `gorm:"rating" json:"rating"`
+	Rating      RateScore `gorm:"rating" json:"rating"`
 	Release     string    `gorm:"release" json:"release"`
 	Label       string    `gorm:"label" json:"label"`
 	Magnet      string    `gorm:"magnet" json:"magnet"`
@@ -299,25 +314,6 @@ func QueryTree(objectID []int) map[int][]int {
 	res := make(map[int][]int)
 	for _, v := range tree {
 		res[v.ObjectID] = append(res[v.ObjectID], v.TreeID)
-	}
-	return res
-}
-
-func queryRelation(objectID []int, t interface{}) map[int][]int {
-	if len(objectID) == 0 {
-		return map[int][]int{}
-	}
-	refType := reflect.TypeOf(t)
-	queryRes := reflect.New(refType)
-	if err := commom.DB.Model(t).Where("object_id in (?)", objectID).Find(&queryRes).Error; err != nil {
-		return map[int][]int{}
-	}
-	res := make(map[int][]int)
-	for i := 0; i < queryRes.Len(); i++ {
-		v := queryRes.Index(i)
-		objectID := v.FieldByName("ObjectID").Int()
-		id := v.FieldByName("ID").Int()
-		res[int(objectID)] = append(res[int(objectID)], int(id))
 	}
 	return res
 }

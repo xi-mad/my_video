@@ -43,7 +43,7 @@ func GetMenu(c *gin.Context) {
 		Name:      "视频分组",
 		Component: "BasicLayout",
 		Path:      "/",
-		Redirect:  "/video/object",
+		Redirect:  "/video/collection",
 		Children: []Menu{{
 			ID:        2,
 			Pid:       1,
@@ -52,8 +52,17 @@ func GetMenu(c *gin.Context) {
 			Name:      "我的视频",
 			Component: "RouteView",
 			Path:      "/video",
-			Redirect:  "/video/object",
+			Redirect:  "/video/collection",
 			Children: []Menu{{
+				ID:        9,
+				Pid:       2,
+				Key:       "video_collection",
+				Name:      "合集管理",
+				Path:      "/video/collection",
+				Component: "/video/collection",
+				Icon:      "",
+				KeepAlive: true,
+			}, {
 				ID:        10,
 				Pid:       2,
 				Key:       "video_object",
@@ -61,7 +70,6 @@ func GetMenu(c *gin.Context) {
 				Path:      "/video/object",
 				Component: "/video/object",
 				Icon:      "",
-				KeepAlive: true,
 			}, {
 				ID:        11,
 				Pid:       2,

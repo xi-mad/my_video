@@ -6,8 +6,8 @@
       </a-form-item>
       <a-form :model="searchValue" layout="inline" autocomplete="off">
 
-        <a-form-item label="路径" name="path">
-          <a-input v-model:value="searchValue.path"/>
+        <a-form-item label="合集名称" name="name">
+          <a-input v-model:value="searchValue.name"/>
         </a-form-item>
         <a-form-item label="演员" name="actress">
           <a-select
@@ -48,80 +48,17 @@
           </a-tree-select>
 
         </a-form-item>
-        <a-form-item label="带有NFO">
-          <a-switch v-model:checked="searchValue.nfo"/>
-        </a-form-item>
 
         <a-form-item>
           <a-button type="primary" @click="() => {refresh()}" >搜索</a-button>
         </a-form-item>
       </a-form>
       <a-divider/>
-      <a-form-item label="显示">
-        <a-space direction="vertical">
-          <a-radio-group v-model:value="showImage" :options="[
-            { label: '默认', value: 'thumbnail' },
-            { label: 'fanart', value: 'fanart' },
-            { label: 'poster', value: 'poster' },
-            { label: 'thumb', value: 'thumb' },
-          ]" />
-        </a-space>
-      </a-form-item>
-      <a-divider/>
       <a-button-group>
-        <a-button type="primary" @click="create">新建对象</a-button>
+        <a-button type="primary" @click="create">新建合集</a-button>
         <a-popconfirm v-if="manageMode" title="确认删除" @confirm="deleteSelect">
           <a-button type="danger">删除选中</a-button>
         </a-popconfirm>
-        <a-popover v-model:visible="pathVisible" title="扫描路径" trigger="click">
-          <template #content>
-            <a-form :model="object" :label-col="{ style: { width: '75px' } }" :wrapper-col="{ span: 14 }">
-              <a-form-item label="路径">
-                <a-input v-model:value="object.scanPath" placeholder="路径"/>
-              </a-form-item>
-              <a-form-item label="演员">
-                <a-select
-                    v-model:value="object.actress"
-                    mode="multiple"
-                    style="width: 100%"
-                    :filter-option="filterOption"
-                    :options="actressOptions"
-                ></a-select>
-              </a-form-item>
-              <a-form-item label="标签">
-                <a-select
-                    v-model:value="object.tag"
-                    mode="multiple"
-                    style="width: 100%"
-                    :filter-option="filterOption"
-                    :options="tagOptions"
-                ></a-select>
-              </a-form-item>
-              <a-form-item label="分组">
-                <a-tree-select
-                    v-model:value="object.tree"
-                    show-search
-                    style="width: 100%"
-                    :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-                    allow-clear
-                    multiple
-                    :show-checked-strategy="SHOW_ALL"
-                    tree-default-expand-all
-                    :tree-data="treeOptions"
-                >
-                  <template #tagRender="{ label, closable, onClose, option }">
-                    <a-tag :closable="closable" :color="option.color" style="margin-right: 3px" @close="onClose">
-                      {{ label }}&nbsp;&nbsp;
-                    </a-tag>
-                  </template>
-                </a-tree-select>
-              </a-form-item>
-            </a-form>
-            <a-button style="margin-top: 5px" size="middle" @click="scan">确定</a-button>
-          </template>
-          <a-button type="primary">路径扫描</a-button>
-        </a-popover>
-        <a-button @click="() => {logVisible = true}">扫描日志</a-button>
       </a-button-group>
       <a-divider/>
       <a-pagination
@@ -134,49 +71,33 @@
       <div v-if="manageMode">
         <a-image-preview-group>
           <a-table :dataSource="objects"
-                 :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" rowKey="id" :columns="columns" :pagination="false">
-          <template #bodyCell="{ column, text, record }">
-            <template v-if="column.dataIndex === 'thumbnail'">
-              <a-image v-if="record.exist_nfo && showImage === 'thumb'"
-                  :src="'data:image/jpg;base64,' + record.thumb"
-                  :alt="record.name"
-                  :width="100"
-              />
-              <a-image v-if="record.exist_nfo && showImage === 'poster'"
-                  :src="'data:image/jpg;base64,' + record.poster"
-                  :alt="record.name"
-                  :width="100"
-              />
-              <a-image v-if="record.exist_nfo && showImage === 'fanart'"
-                  :src="'data:image/jpg;base64,' + record.fanart"
-                  :alt="record.name"
-                  :width="100"
-              />
-              <a-image v-if="!record.exist_nfo || showImage === 'thumbnail'"
-                  :src="'data:image/jpg;base64,' + record.thumbnail"
-                  :alt="record.name"
-                  :width="100"
-              />
-            </template>
-            <template v-else-if="column.dataIndex === 'description'">
-              <a href="#" :title="record.description">{{record.description.substring(0, 20)}}</a>
-            </template>
-            <template v-else-if="column.dataIndex === 'action'">
-              <a-button size="small" type="primary" @click="updateRecord(record)">
-                <template #icon>
-                  <EditOutlined/>
-                </template>
-              </a-button>
-              <a-popconfirm title="确认删除" @confirm="deleteRecord(record.id)">
-                <a-button size="small" type="danger">
+                   :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" rowKey="id" :columns="columns" :pagination="false">
+            <template #bodyCell="{ column, text, record }">
+              <template v-if="column.dataIndex === 'thumbnail'">
+                <a-image :src="'data:image/jpg;base64,' + record.thumb"
+                         :alt="record.name"
+                         :width="100"
+                />
+              </template>
+              <template v-else-if="column.dataIndex === 'description'">
+                <a href="#" :title="record.description">{{record.description.substring(0, 20)}}</a>
+              </template>
+              <template v-else-if="column.dataIndex === 'action'">
+                <a-button size="small" type="primary" @click="updateRecord(record)">
                   <template #icon>
-                    <DeleteOutlined/>
+                    <EditOutlined/>
                   </template>
                 </a-button>
-              </a-popconfirm>
+                <a-popconfirm title="确认删除" @confirm="deleteRecord(record.id)">
+                  <a-button size="small" type="danger">
+                    <template #icon>
+                      <DeleteOutlined/>
+                    </template>
+                  </a-button>
+                </a-popconfirm>
+              </template>
             </template>
-          </template>
-        </a-table>
+          </a-table>
         </a-image-preview-group>
       </div>
       <div v-else>
@@ -185,56 +106,8 @@
             <ul class="custom_container">
               <template v-for="(object, index) in objects" :key="index">
                 <li class="custom_card">
-                  <a-image v-if="object.exist_nfo && showImage === 'thumb'" :src="'data:image/jpg;base64,' + object.thumb"/>
-                  <a-image v-if="object.exist_nfo && showImage === 'poster'" :src="'data:image/jpg;base64,' + object.poster"/>
-                  <a-image v-if="object.exist_nfo && showImage === 'fanart'" :src="'data:image/jpg;base64,' + object.fanart"/>
-                  <a-image v-if="!object.exist_nfo || showImage === 'thumbnail'" :src="'data:image/jpg;base64,' + object.thumbnail"/>
-
-                  <a-row style="margin-top: 5px">文件名：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.name }}</p></a-row>
-                  <a-row style="margin-top: 5px">路径：<p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.path }}</p></a-row>
-                  <a-row style="margin-top: 5px">
-                    观看次数：
-                    <a-tag color="cyan">
-                      {{ object.view_count }}
-                    </a-tag>
-                  </a-row>
-                  <a-row style="margin-top: 5px">
-                    演员：
-                    <a-tag v-for="(elem) in object.actress" style="margin-top: 2px" color="green">
-                      {{ actressMap[elem] }}
-                    </a-tag>
-                  </a-row>
-                  <a-row style="margin-top: 5px">
-                    标签：
-                    <a-tag v-for="(elem) in object.tag" style="margin-top: 2px" color="pink">
-                      {{ tagMap[elem] }}
-                    </a-tag>
-                  </a-row>
-                  <a-row style="margin-top: 5px">
-                    分类：
-                    <a-tag v-for="(elem) in object.tree" style="margin-top: 2px" color="purple">
-                      {{ treeMap[elem] }}
-                    </a-tag>
-                  </a-row>
-                  <a-row style="margin-top: 5px">
-                    <a-button-group>
-                      <a-button size="small"  @click="playInBrowser(object)">
-                        <template #icon>
-                          <PlayCircleOutlined />
-                        </template>
-                      </a-button>
-                      <a-button size="small"  @click="playInOS(object)">
-                        <template #icon>
-                          <PlaySquareOutlined/>
-                        </template>
-                      </a-button>
-                      <a-button size="small" type="primary" @click="updateRecord(object)">
-                        <template #icon>
-                          <EditOutlined/>
-                        </template>
-                      </a-button>
-                    </a-button-group>
-                  </a-row>
+                  <a-image :src="'data:image/jpg;base64,' + object.thumb"/>
+                  <a-row style="margin-top: 5px"><p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.name }}</p></a-row>
                 </li>
               </template>
             </ul>
@@ -306,94 +179,20 @@
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-modal v-model:visible="logVisible" title="扫描日志" @ok="" width="1000px" :maskClosable="false" :keyboard="false">
-      <template #footer>
-        <a-button @click="() => {logVisible = false}">关闭</a-button>
-      </template>
-      <a-textarea v-model:value="logValue" placeholder="扫描日志" disabled="" :rows="30" />
-    </a-modal>
-
-    <a-modal v-model:visible="videoVisible" title="播放" @ok="" @cancel="stopPlay" width="1000px" :maskClosable="false" :keyboard="false">
-      <template #footer>
-        <a-button @click="stopPlay">关闭</a-button>
-      </template>
-      <div class="video-container">
-        <vue3VideoPlay ref="player" v-bind="options"/>
-      </div>
-    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive} from 'vue';
-import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc} from "@/api/object";
-import {DeleteOutlined, EditOutlined, PlaySquareOutlined, PlayCircleOutlined} from '@ant-design/icons-vue';
+import {onMounted, ref} from 'vue';
+import {createObject, deleteObject, listObject, updateObject} from "@/api/object";
+import {DeleteOutlined, EditOutlined} from '@ant-design/icons-vue';
 import {message, TreeSelect} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
 import {optionsTree} from "@/api/tree";
 import {buildTree} from "@/utils/util";
 
-const showImage = ref<string>("thumbnail");
-
-const videoVisible = ref<boolean>(false);
-const player = ref<any>();
-
-const options = reactive({
-  width: '100%', //播放器高度
-  height: '100%', //播放器高度
-  color: "#409eff", //主题色
-  title: '', //视频名称
-  src: "", //视频源
-  muted: false, //静音
-  webFullScreen: false,
-  poster: "", //封面图
-  speedRate: ["0.75", "1.0", "1.25", "1.5", "2.0"], //播放倍速
-  autoPlay: false, //自动播放
-  loop: false, //循环播放
-  mirror: false, //镜像画面
-  ligthOff: false,  //关灯模式
-  volume: 0.2, //默认音量大小
-  control: true, //是否显示控制
-  controlBtns:['audioTrack', 'quality', 'speedRate', 'volume', 'setting', 'pip', 'pageFullScreen', 'fullScreen'] //显示所有按钮,
-})
-
 const SHOW_ALL = TreeSelect.SHOW_ALL;
-
-const pathVisible = ref<boolean>(false);
-const logVisible = ref<boolean>(false);
-
-const logValue = ref<string>('');
-
-const scanLog = () => {
-  setTimeout(() => {
-    if (logVisible.value) {
-      log().then(response => {
-        logValue.value += response.data.data;
-      });
-    }
-    scanLog()
-  }, 3000);
-};
-scanLog();
-
-
-const scan = () => {
-  if (!object.value.scanPath) {
-    message.warning('请输入扫描路径');
-    return;
-  }
-  pathVisible.value = false;
-  scanObject({
-    path: object.value.scanPath,
-    actress: object.value.actress,
-    tag: object.value.tag,
-    tree: object.value.tree,
-  }).then(response => {
-    message.success('任务开始');
-    logVisible.value = true;
-  });
-};
 
 const manageMode = ref<boolean>(false);
 
@@ -459,26 +258,6 @@ const submit = () => {
     }
     visible.value = false;
   }
-};
-
-const playInOS = (record: any) => {
-  playPath(record.path).then(response => {
-    message.info("播放成功");
-  });
-  viewinc(record.id).then(response => {});
-};
-
-const playInBrowser = (record: any) => {
-  videoVisible.value = true;
-  options.title = record.name;
-  options.poster = 'data:image/jpg;base64,' + record.thumbnail;
-  options.src = videoPath(record.path);
-  viewinc(record.id).then(response => {});
-};
-
-const stopPlay = () => {
-  videoVisible.value = false;
-  player.value.pause()
 };
 
 const updateRecord = (record: any) => {
@@ -595,11 +374,10 @@ const sizeChange = (nPage: number, nPageSize: number) => {
 };
 
 const searchValue = ref<any>({
-  path: '',
+  name: '',
   actress: [],
   tag: [],
   tree: [],
-  nfo: false,
 });
 
 const refresh = () => {
@@ -617,6 +395,7 @@ const refresh = () => {
     total.value = res.data.data.total;
   });
 };
+
 
 onMounted(() => {
   optionsActress().then((res) => {

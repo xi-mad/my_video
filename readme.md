@@ -37,16 +37,6 @@
 
 如果运行报错，请打开cmd 进到当前目录下，然后运行 ./my_video.exe， 把日志贴过来，方便排查
 
-
-### 文件夹介绍
-```
-config          配置文件夹
-data            数据库文件夹
-static          网页文件
-temp            临时数据文件夹，生成的缩略图暂时存到这里，然后会删除，有时候会删除失败。这个文件夹的数据可以直接删掉
-my_video.exe    主程序，运行后，在浏览器打开：http://127.0.0.1:8080/
-```
-
 ### mtn工具
 https://moviethumbnail.sourceforge.net/
 

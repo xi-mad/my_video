@@ -50,7 +50,7 @@ mtn也解压到任意目录，比如：D:\soft\mtn-200808a-win32
    1. path：数据库文件路径，一般不需要修改  
 3. thumbnail：缩略图配置  
    1. mtn：mtn的路径，注意这里要修改为你的mtn路径，`这里的斜杠是/，不是\ `     
-   2. font：字体文件路径，这里要修改为字体的路径，windows在C:/Windows/Fonts下，macos在/Library/Fonts下，`这里的斜杠是/，不是\ `    
+   2. font：字体文件路径，这里要修改为字体的路径，windows在C:/Windows/Fonts下`注意检查一下，改成自己电脑上有的字体`，macos在/Library/Fonts下，`这里的斜杠是/，不是\ `    
    3. width：缩略图宽度，一般不需要修改，如果想生成大的缩略图，可以改大  
    4. col与row：缩略图的列数与行数，一般不需要修改，如果想生成大的缩略图，可以改大。这里的width、col和row是默认的，可以被optional覆盖  
    5. optional：这个是根据文件大小配置生成缩略图的  

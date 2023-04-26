@@ -52,7 +52,7 @@ thumbnail:
 # 通用
 
 ### 配置文件修改，[config.yaml](https://github.com/xi-mad/my_video/blob/master/backend/config/config.yaml)
-配置文件分为一下几个部分：  
+配置文件分为以下几个部分：  
 1. app：应用配置一般不需要修改  
    1. app下的mode：运行模式，debug模式会打印更多日志，release模式会打印少量日志  
    2. port是端口号，可以修改一般在1-65535  

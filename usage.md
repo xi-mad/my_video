@@ -10,14 +10,6 @@
 解压my_video_full.rar到任意目录，比如：D:\soft\my_video\my_video_full  
 mtn也解压到任意目录，比如：D:\soft\mtn-200808a-win32
 
-### 配置
-在config文件夹下的config.yaml修改配置信息，配置mth路径，字体路径
-```
-thumbnail:
-  mtn: "D:/soft/mtn-200808a-win32/mtn.exe" 
-  font: "C:/Windows/Fonts/STSONG.TTF"
-```
-
 ### 运行
 运行 my_video.exe  
 
@@ -41,9 +33,6 @@ thumbnail:
 ### 解压
 解压my_video_macos_full.zip到任意目录，比如：/Users/xxx/my_video_full
 
-### 配置
-修改config.yaml配置文件，配置mth路径，字体路径 一行的最后有# macos 的是mac的配置
-
 ### 运行
 打开命令行，先cd到my_video目录，然后执行`./my_video`，不要关闭命令行
 
@@ -51,7 +40,7 @@ thumbnail:
 
 # 通用
 
-### 配置文件修改，[config.yaml](https://github.com/xi-mad/my_video/blob/master/backend/config/config.yaml)
+### 配置文件修改，修改后要重启才会生效。[config.yaml](https://github.com/xi-mad/my_video/blob/master/backend/config/config.yaml)
 配置文件分为以下几个部分：  
 1. app：应用配置一般不需要修改  
    1. app下的mode：运行模式，debug模式会打印更多日志，release模式会打印少量日志  

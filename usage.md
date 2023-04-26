@@ -51,6 +51,25 @@ thumbnail:
 
 # 通用
 
+### 配置文件修改，[config.yaml](https://github.com/xi-mad/my_video/blob/master/backend/config/config.yaml)
+配置文件分为一下几个部分：  
+1. app：应用配置一般不需要修改  
+   1. app下的mode：运行模式，debug模式会打印更多日志，release模式会打印少量日志  
+   2. port是端口号，可以修改一般在1-65535  
+   3. server-mode为是否是服务器模式，如果是服务器模式，会保留命令行，windows下运行一般设置为false即可，macos下运行一般设置为true
+2. sqlite：数据库配置，一般不需要修改  
+   1. path：数据库文件路径，一般不需要修改  
+3. thumbnail：缩略图配置  
+   1. mtn：mtn的路径，注意这里要修改为你的mtn路径，`这里的斜杠是/，不是\ `     
+   2. font：字体文件路径，这里要修改为字体的路径，windows在C:/Windows/Fonts下，macos在/Library/Fonts下，`这里的斜杠是/，不是\ `    
+   3. width：缩略图宽度，一般不需要修改，如果想生成大的缩略图，可以改大  
+   4. col与row：缩略图的列数与行数，一般不需要修改，如果想生成大的缩略图，可以改大  
+   5. optional：这个是根据文件夹大小配置生成缩略图的  
+   6. optional.fsizeless：文件大小小于这个值，则使用对应的col、row和width，可以配置多个，往后追加即可
+4. player：配置本地播放器，现在支持potplayer，别的未测试，如果需要支持别的播放器请提issue  
+   1. path：播放器路径，这里要修改为你的播放器路径，`这里的斜杠是/，不是\ `
+
+
 ### 使用
 打开浏览器输入：http://127.0.0.1:8080/ (端口号默认是8080，配置文件中可以修改)  
 登陆用户名密码随便写，没有校验

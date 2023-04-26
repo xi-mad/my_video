@@ -47,36 +47,6 @@ temp            临时数据文件夹，生成的缩略图暂时存到这里，�
 my_video.exe    主程序，运行后，在浏览器打开：http://127.0.0.1:8080/
 ```
 
-### 配置文件介绍
-```
-app:
-  mode: "debug" // debug 模式可以看到SQL语句
-  port: 8080 // 运行端口号
-  server-mode: false // 是否服务器模式，如果是服务器模式则会保留命令行输出，否则会将程序隐藏到托盘栏
-  
-sqlite:
-  path: "./data/my_video.db"   // 数据库路径
-
-thumbnail:
-  mtn: "D:/soft/mtn-200808a-win32/mtn.exe" //mtn 工具路径，这个是创建缩略图的工具
-  width: 2048 // 缩略图的宽
-  row: 6  // 每行几个缩略图
-  col: 6  // 每列几个缩略图
-  optional:  // 现在你可以根据文件大小自定义缩略图的宽和个数了，会自动选择一个最接近的配置，如果不设置，就会使用上面的width、row、col
-    - fsizeless: 16
-      width: 1024
-      row: 3
-      col: 3
-    - fsizeless: 64
-      width: 2048
-      row: 4
-      col: 4
-  font: "C:/Windows/Fonts/STSONG.TTF" // 电脑的中文字体，mtn要用，否则中文不显示
-
-player:
-  path: "D:/soft/PotPlayer64/PotPlayerMini64.exe"  // potplayer 地址，可以支持 调用potplayer播放
-```
-
 ### mtn工具
 https://moviethumbnail.sourceforge.net/
 

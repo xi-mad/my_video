@@ -45,7 +45,7 @@ mtn也解压到任意目录，比如：D:\soft\mtn-200808a-win32
 1. app：应用配置一般不需要修改  
    1. app下的mode：运行模式，debug模式会打印更多日志，release模式会打印少量日志  
    2. port是端口号，可以修改一般在1-65535  
-   3. server-mode为是否是服务器模式，如果是服务器模式，会保留命令行，windows下运行一般设置为false即可，macos下运行一般设置为true
+   3. server-mode为是否是服务器模式，如果是服务器模式，会保留命令行，windows下运行一般设置为false即可，macos下运行务必改为true，否则会占用大量cpu
 2. sqlite：数据库配置，一般不需要修改  
    1. path：数据库文件路径，一般不需要修改  
 3. thumbnail：缩略图配置  

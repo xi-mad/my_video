@@ -53,7 +53,7 @@ mtn也解压到任意目录，比如：D:\soft\mtn-200808a-win32
    2. font：字体文件路径，这里要修改为字体的路径，windows在C:/Windows/Fonts下，macos在/Library/Fonts下，`这里的斜杠是/，不是\ `    
    3. width：缩略图宽度，一般不需要修改，如果想生成大的缩略图，可以改大  
    4. col与row：缩略图的列数与行数，一般不需要修改，如果想生成大的缩略图，可以改大。这里的width、col和row是默认的，可以被optional覆盖  
-   5. optional：这个是根据文件夹大小配置生成缩略图的  
+   5. optional：这个是根据文件大小配置生成缩略图的  
    6. optional.fsizeless：文件大小小于这个值，则使用对应的col、row和width，可以配置多个，往后追加即可
 4. player：配置本地播放器，现在支持potplayer，别的未测试，如果需要支持别的播放器请提issue  
    1. path：播放器路径，这里要修改为你的播放器路径，`这里的斜杠是/，不是\ `

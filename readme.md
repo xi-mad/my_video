@@ -35,8 +35,6 @@
 - [x] 记录日志，存入到log文件夹
 - [x] 启动通知，尽力而为
 
-如果运行报错，请打开cmd 进到当前目录下，然后运行 ./my_video.exe， 把日志贴过来，方便排查
-
 ### mtn工具
 https://moviethumbnail.sourceforge.net/
 

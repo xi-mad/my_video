@@ -5,7 +5,9 @@ import (
 	"github.com/getlantern/systray"
 	"github.com/gin-gonic/gin"
 	"github.com/xi-mad/my_video/actress"
-	conf "github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/collection"
+	conf "github.com/xi-mad/my_video/common"
+	"github.com/xi-mad/my_video/front_config"
 	"github.com/xi-mad/my_video/object"
 	"github.com/xi-mad/my_video/plantform"
 	"github.com/xi-mad/my_video/tag"
@@ -43,11 +45,13 @@ func main() {
 	r.StaticFile("/", "./static/index.html")
 
 	api := r.Group("/api")
+	front_config.Register(api.Group("/config"))
 	user.Register(api.Group("/user"))
 	tag.Register(api.Group("/tag"))
 	tree.Register(api.Group("/tree"))
 	object.Register(api.Group("/object"))
 	actress.Register(api.Group("/actress"))
+	collection.Register(api.Group("/collection"))
 	log.Printf("server start at %s\n", conf.DefaultConfig.App.Port)
 	log.Printf("please open http://localhost:%s or http://127.0.0.1:%s\n", conf.DefaultConfig.App.Port, conf.DefaultConfig.App.Port)
 	go aNotify()
@@ -120,4 +124,5 @@ func AutoMigrate() {
 	tree.AutoMigrate()
 	object.AutoMigrate()
 	actress.AutoMigrate()
+	collection.AutoMigrate()
 }

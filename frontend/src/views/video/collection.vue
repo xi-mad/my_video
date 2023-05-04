@@ -5,50 +5,9 @@
         <a-switch v-model:checked="manageMode"/>
       </a-form-item>
       <a-form :model="searchValue" layout="inline" autocomplete="off">
-
-        <a-form-item label="合集名称" name="name">
+        <a-form-item label="名称" name="name">
           <a-input v-model:value="searchValue.name"/>
         </a-form-item>
-        <a-form-item label="演员" name="actress">
-          <a-select
-              style="width: 200px"
-              show-search
-              mode="multiple"
-              v-model:value="searchValue.actress"
-              :filter-option="filterOption"
-              :options="actressOptions"
-          ></a-select>
-        </a-form-item>
-        <a-form-item label="标签" name="tag">
-          <a-select
-              style="width: 200px"
-              v-model:value="searchValue.tag"
-              mode="multiple"
-              :filter-option="filterOption"
-              :options="tagOptions"
-          ></a-select>
-        </a-form-item>
-        <a-form-item label="分类" name="tree">
-          <a-tree-select
-              style="width: 200px"
-              v-model:value="searchValue.tree"
-              show-search
-              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-              allow-clear
-              multiple
-              :show-checked-strategy="SHOW_ALL"
-              tree-default-expand-all
-              :tree-data="treeOptions"
-          >
-            <template #tagRender="{ label, closable, onClose, option }">
-              <a-tag :closable="closable" :color="option.color" style="margin-right: 3px" @close="onClose">
-                {{ label }}&nbsp;&nbsp;
-              </a-tag>
-            </template>
-          </a-tree-select>
-
-        </a-form-item>
-
         <a-form-item>
           <a-button type="primary" @click="() => {refresh()}" >搜索</a-button>
         </a-form-item>
@@ -70,17 +29,24 @@
       />
       <div v-if="manageMode">
         <a-image-preview-group>
-          <a-table :dataSource="objects"
+          <a-table :dataSource="collections"
                    :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" rowKey="id" :columns="columns" :pagination="false">
             <template #bodyCell="{ column, text, record }">
               <template v-if="column.dataIndex === 'thumbnail'">
-                <a-image :src="'data:image/jpg;base64,' + record.thumb"
+                <a-image :src="record.cover"
                          :alt="record.name"
                          :width="100"
                 />
               </template>
-              <template v-else-if="column.dataIndex === 'description'">
-                <a href="#" :title="record.description">{{record.description.substring(0, 20)}}</a>
+              <template v-if="column.dataIndex === 'actress1'">
+                <a-tag v-for="(elem) in parseJson(record.actress)" style="margin-top: 2px" color="green">
+                  {{ elem }}
+                </a-tag>
+              </template>
+              <template v-if="column.dataIndex === 'labels1'">
+                <a-tag v-for="(elem) in parseJson(record.labels)" style="margin-top: 2px" color="pink">
+                  {{ elem }}
+                </a-tag>
               </template>
               <template v-else-if="column.dataIndex === 'action'">
                 <a-button size="small" type="primary" @click="updateRecord(record)">
@@ -104,10 +70,38 @@
         <a-card>
           <a-image-preview-group>
             <ul class="custom_container">
-              <template v-for="(object, index) in objects" :key="index">
-                <li class="custom_card">
-                  <a-image :src="'data:image/jpg;base64,' + object.thumb"/>
-                  <a-row style="margin-top: 5px"><p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ object.name }}</p></a-row>
+              <template v-for="(collection, index) in collections" :key="index">
+                <li class="custom_card" :style="'height:' + config.collectionHeight">
+                  <a-image :src="collection.cover"/>
+                  <a-row style="margin-top: 5px"><p style="text-overflow: ellipsis; overflow: hidden; margin-bottom: 0">{{ collection.name }}</p></a-row>
+                  <a-row style="margin-top: 5px">
+                    演员：
+                    <a-tag v-for="(elem) in parseJson(collection.actress)" style="margin-top: 2px" color="green">
+                      {{ elem }}
+                    </a-tag>
+                  </a-row>
+                  <a-row style="margin-top: 5px">
+                    标签：
+                    <a-tag v-for="(elem) in parseJson(collection.labels)" style="margin-top: 2px" color="pink">
+                      {{ elem }}
+                    </a-tag>
+                  </a-row>
+                  <a-row style="margin-top: 5px">
+                    <a-button-group>
+                      <a-button size="small" type="primary" @click="updateRecord(collection)">
+                        <template #icon>
+                          <EditOutlined/>
+                        </template>
+                      </a-button>
+                      <a-popconfirm title="确认删除" @confirm="deleteRecord(collection.id)">
+                        <a-button size="small" type="danger">
+                          <template #icon>
+                            <DeleteOutlined/>
+                          </template>
+                        </a-button>
+                      </a-popconfirm>
+                    </a-button-group>
+                  </a-row>
                 </li>
               </template>
             </ul>
@@ -123,16 +117,21 @@
       />
     </a-card>
     <a-modal v-model:visible="visible" :title="modalTitle" @ok="submit" :maskClosable="false" :keyboard="false">
-      <a-form :model="object" :label-col="{ style: { width: '150px' } }" :wrapper-col="{ span: 14 }">
-        <a-form-item label="路径" :rules="[{ required: true }]">
-          <a-input v-model:value="object.path"/>
+      <a-form :model="collection" :label-col="{ style: { width: '150px' } }" :wrapper-col="{ span: 14 }">
+        <a-form-item label="封面" :rules="[{ required: true }]">
+          <a-image v-if="collection.cover" :src="collection.cover" alt="avatar" />
+          <a-upload :show-upload-list="false" @change="coverChange" :before-upload="() => false">
+            <a-button style="margin: 10px 0 0 10px">
+              <plus-outlined/>
+            </a-button>
+          </a-upload>
         </a-form-item>
-        <a-form-item label="名称">
-          <a-input v-model:value="object.name"/>
+        <a-form-item label="名称" :rules="[{ required: true }]">
+          <a-input v-model:value="collection.name"/>
         </a-form-item>
         <a-form-item label="演员">
           <a-select
-              v-model:value="object.actress"
+              v-model:value="collection.actress"
               mode="multiple"
               style="width: 100%"
               :filter-option="filterOption"
@@ -141,41 +140,12 @@
         </a-form-item>
         <a-form-item label="标签">
           <a-select
-              v-model:value="object.tag"
+              v-model:value="collection.tag"
               mode="multiple"
               style="width: 100%"
               :filter-option="filterOption"
               :options="tagOptions"
           ></a-select>
-        </a-form-item>
-        <a-form-item label="分组">
-          <a-tree-select
-              v-model:value="object.tree"
-              show-search
-              style="width: 100%"
-              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-              allow-clear
-              multiple
-              :show-checked-strategy="SHOW_ALL"
-              tree-default-expand-all
-              :tree-data="treeOptions"
-          >
-            <template #tagRender="{ label, closable, onClose, option }">
-              <a-tag :closable="closable" :color="option.color" style="margin-right: 3px" @close="onClose">
-                {{ label }}&nbsp;&nbsp;
-              </a-tag>
-            </template>
-          </a-tree-select>
-        </a-form-item>
-        <a-form-item label="磁力链接">
-          <a-input v-model:value="object.magnet"/>
-        </a-form-item>
-        <a-form-item label="描述">
-          <a-textarea
-              v-model:value="object.description"
-              placeholder=""
-              :auto-size="{ minRows: 2, maxRows: 5 }"
-          />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -184,17 +154,16 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {createObject, deleteObject, listObject, updateObject} from "@/api/object";
-import {DeleteOutlined, EditOutlined} from '@ant-design/icons-vue';
-import {message, TreeSelect} from 'ant-design-vue';
+import {listCollection, createCollection, updateCollection, deleteCollection, detailCollection} from "@/api/collection";
+import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import {message} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
-import {optionsTree} from "@/api/tree";
-import {buildTree} from "@/utils/util";
-
-const SHOW_ALL = TreeSelect.SHOW_ALL;
+import {parseJson} from "@/utils";
+import {getConfig} from "@/api/config";
 
 const manageMode = ref<boolean>(false);
+const config = ref<any>({});
 
 const visible = ref<boolean>(false);
 const modalTitle = ref<string>('');
@@ -202,56 +171,58 @@ const modalTitle = ref<string>('');
 const empty = {
   id: 0,
   name: '',
-  description: '',
-  path: '',
-  magnet: '',
-  scanPath: '',
+  cover: '',
 
   actress: [],
   tag: [],
-  tree: [],
 }
+const loading = ref<boolean>(false);
 
-const object = ref<any>(empty);
+const collection = ref<any>(empty);
+
+const coverChange = (info: any) => {
+  const { file } = info;
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => {
+    collection.value.cover = reader.result;
+  };
+};
 
 const create = () => {
   visible.value = true;
   modalTitle.value = '添加对象';
-  object.value = {...empty};
+  collection.value = {...empty};
 };
 
 const submit = () => {
   let valid = true;
-  if (!object.value.path) {
-    message.warning('请输入路径');
+  if (!collection.value.cover) {
+    message.warning('请上传封面');
+    valid = false;
+  }
+  if (!collection.value.name) {
+    message.warning('请输入集合名称');
     valid = false;
   }
 
   if (valid) {
-    if (object.value.id === 0) {
-      createObject({
-        name: object.value.name,
-        description: object.value.description,
-        path: object.value.path,
-        magnet: object.value.magnet,
-        actress: object.value.actress,
-        tag: object.value.tag,
-        tree: object.value.tree,
-
+    if (collection.value.id === 0) {
+      createCollection({
+        name: collection.value.name,
+        actress: JSON.stringify(collection.value.actress),
+        labels: JSON.stringify(collection.value.tag),
+        cover: collection.value.cover,
       }).then(() => {
         refresh();
       });
     } else {
-      updateObject({
-        id: object.value.id,
-        name: object.value.name,
-        description: object.value.description,
-        path: object.value.path,
-        magnet: object.value.magnet,
-        actress: object.value.actress,
-        tag: object.value.tag,
-        tree: object.value.tree,
-
+      updateCollection({
+        id: collection.value.id,
+        name: collection.value.name,
+        actress: JSON.stringify(collection.value.actress),
+        labels: JSON.stringify(collection.value.tag),
+        cover: collection.value.cover,
       }).then(() => {
         refresh();
       })
@@ -263,20 +234,17 @@ const submit = () => {
 const updateRecord = (record: any) => {
   visible.value = true;
   modalTitle.value = '修改对象';
-  object.value = {
+  collection.value = {
     id: record.id,
     name: record.name,
-    description: record.description,
-    path: record.path,
-    magnet: record.magnet,
-    actress: record.actress,
-    tag: record.tag,
-    tree: record.tree,
+    actress: parseJson(record.actress),
+    tag: parseJson(record.labels),
+    cover: record.cover,
   };
 };
 
 const deleteRecord = (id: number) => {
-  deleteObject({
+  deleteCollection({
     id: [id]
   }).then(() => {
     refresh();
@@ -287,7 +255,7 @@ const deleteSelect = () => {
     message.warning('请选择要删除的对象');
     return;
   }
-  deleteObject({
+  deleteCollection({
     id: selectedRowKeys.value
   }).then(() => {
     refresh();
@@ -301,39 +269,17 @@ const onSelectChange = (rowKeys: any[]) => {
 
 const columns = [
   {
-    title: '编号',
-    dataIndex: 'num',
-    key: 'num',
-  },
-  {
-    title: '发布日',
-    dataIndex: 'release',
-    key: 'release',
-  },
-  {
-    title: '标签',
-    dataIndex: 'label',
-    key: 'label',
-  },
-  {
     title: '名称',
     dataIndex: 'name',
     key: 'name',
   },
   {
-    title: '描述',
-    dataIndex: 'description',
-    key: 'description',
+    title: '演员',
+    dataIndex: 'actress1',
   },
   {
-    title: '路径',
-    dataIndex: 'path',
-    key: 'path',
-  },
-  {
-    title: '磁力链接',
-    dataIndex: 'magnet',
-    key: 'magnet',
+    title: '标签',
+    dataIndex: 'labels1',
   },
   {
     title: '预览图',
@@ -350,12 +296,10 @@ const columns = [
   },
 ];
 
-const objects = ref<any[]>([]);
+const collections = ref<any[]>([]);
 const actressOptions = ref<any[]>([]);
 const tagOptions = ref<any[]>([]);
-const treeOptions = ref<any[]>([]);
 
-const treeMap = {};
 const actressMap = {};
 const tagMap = {};
 
@@ -375,45 +319,48 @@ const sizeChange = (nPage: number, nPageSize: number) => {
 
 const searchValue = ref<any>({
   name: '',
-  actress: [],
-  tag: [],
-  tree: [],
 });
 
 const refresh = () => {
   const data = {
     page: page.value,
     page_size: pageSize.value,
-    path: searchValue.value.path,
-    actress: searchValue.value.actress,
-    tag: searchValue.value.tag,
-    tree: searchValue.value.tree,
-    nfo: searchValue.value.nfo,
+    name: searchValue.value.name,
   };
-  listObject(data).then((res) => {
-    objects.value = res.data.data.data;
+  listCollection(data).then((res) => {
+    collections.value = res.data.data.data;
     total.value = res.data.data.total;
   });
 };
 
 
 onMounted(() => {
+  detailCollection(1).then((res) => {
+    console.log(res.data.data);
+  });
+
+  getConfig().then((res) => {
+    config.value = res.data.data;
+  });
+
   optionsActress().then((res) => {
-    actressOptions.value = res.data.data;
+    actressOptions.value = []
     res.data.data.forEach((item: any) => {
-      actressMap[item.value] = item.label;
+      actressMap[item.label] = item.label;
+      actressOptions.value.push({
+        label: item.label,
+        value: item.label,
+      });
     });
   });
   optionsTag().then((res) => {
-    tagOptions.value = res.data.data;
+    tagOptions.value = [];
     res.data.data.forEach((item: any) => {
-      tagMap[item.value] = item.label;
-    });
-  });
-  optionsTree().then((res) => {
-    treeOptions.value = buildTree(res.data.data);
-    res.data.data.forEach((item: any) => {
-      treeMap[item.value] = item.label;
+      tagMap[item.label] = item.label;
+      tagOptions.value.push({
+        label: item.label,
+        value: item.label,
+      });
     });
   });
 
@@ -442,41 +389,24 @@ onMounted(() => {
   .custom_container {
     column-count: 2;
   }
-  .video-container {
-    width: 320px;
-    height: 240px;
-  }
 }
 @media (min-width: 760px) and (max-width: 979.5px) {
   .custom_container {
     column-count: 3;
-  }
-  .video-container {
-    width: 720px;
-    height: 540px;
   }
 }
 @media (min-width: 980px) and (max-width: 1023.5px) {
   .custom_container {
     column-count: 4;
   }
-  .video-container {
-    width: 760px;
-    height: 570px;
-  }
 }
 @media (min-width: 1024px) {
   .custom_container {
     column-count: 5;
-  }
-  .video-container {
-    width: 960px;
-    height: 720px;
   }
 }
 textarea:disabled {
   opacity: 1;
   -webkit-text-fill-color: #000;
 }
-
 </style>

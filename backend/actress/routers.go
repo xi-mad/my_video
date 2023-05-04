@@ -3,7 +3,8 @@ package actress
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/samber/lo"
+	"github.com/xi-mad/my_video/common"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +19,7 @@ func Register(router *gin.RouterGroup) {
 func ListActress(c *gin.Context) {
 	var model ListActressModel
 	if err := c.ShouldBindQuery(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 
@@ -29,23 +30,23 @@ func ListActress(c *gin.Context) {
 		})
 	}
 	actress := make([]Actress, 0)
-	err := commom.DB.Model(&Actress{}).Scopes(condition...).Find(&actress).Error
-	c.JSON(200, commom.CommonResultAuto(actress, err))
+	err := common.DB.Model(&Actress{}).Scopes(condition...).Find(&actress).Error
+	c.JSON(200, common.CommonResultAuto(actress, err))
 }
 
 func CreateActress(c *gin.Context) {
 	var model CreateActressModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	c.JSON(200, commom.CommonResultAuto(nil, createActress(model)))
+	c.JSON(200, common.CommonResultAuto(nil, createActress(model)))
 }
 
 func UpdateActress(c *gin.Context) {
 	var model UpdateActressModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	actress := Actress{
@@ -53,28 +54,29 @@ func UpdateActress(c *gin.Context) {
 		Name:  model.Name,
 		Order: model.Order,
 	}
-	err := commom.DB.Updates(&actress).Error
-	c.JSON(200, commom.CommonResultAuto(actress, err))
+	err := common.DB.Updates(&actress).Error
+	c.JSON(200, common.CommonResultAuto(actress, err))
 }
 
 func DeleteActress(c *gin.Context) {
 	var model DeleteActressModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	c.JSON(200, commom.CommonResultAuto(nil, deleteActress(model)))
+	c.JSON(200, common.CommonResultAuto(nil, deleteActress(model)))
 }
 
 func Options(c *gin.Context) {
 	var actress []Actress
-	err := commom.DB.Model(&Actress{}).Select("id, name").Find(&actress).Error
-	options := make([]commom.SelectOption, 0)
-	for _, act := range actress {
-		options = append(options, commom.SelectOption{
+	if err := common.DB.Model(&Actress{}).Select("id, name").Find(&actress).Error; err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+	c.JSON(200, common.CommonResultSuccess(lo.Map(actress, func(act Actress, index int) common.SelectOption {
+		return common.SelectOption{
 			Value: act.ID,
 			Label: act.Name,
-		})
-	}
-	c.JSON(200, commom.CommonResultAuto(options, err))
+		}
+	})))
 }

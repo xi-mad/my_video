@@ -2,6 +2,8 @@ app:
   mode: "debug"
   port: 8080
   server-mode: false
+  object-height: 600px
+  collection-height:
 
 sqlite:
   path: "./data/my_video.db"

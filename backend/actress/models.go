@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/samber/lo"
 	"github.com/xi-mad/my_video/actress_object"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 	"strings"
 	"time"
 )
@@ -32,7 +32,7 @@ func createActress(model CreateActressModel) (err error) {
 			continue
 		}
 		var count int64
-		err := commom.DB.Model(&Actress{}).Where("name = ?", name).Count(&count).Error
+		err := common.DB.Model(&Actress{}).Where("name = ?", name).Count(&count).Error
 		if err != nil {
 			errorMsg += err.Error() + ";\n"
 		}
@@ -40,7 +40,7 @@ func createActress(model CreateActressModel) (err error) {
 			errorMsg += name + "演员已存在;\n"
 			continue
 		}
-		if err = commom.DB.Create(&Actress{
+		if err = common.DB.Create(&Actress{
 			Name:  name,
 			Order: model.Order,
 		}).Error; err != nil {
@@ -56,7 +56,7 @@ func createActress(model CreateActressModel) (err error) {
 func CreateActresses(actresses []string) []int {
 	ids := make([]int, 0)
 	exists := make([]Actress, 0)
-	commom.DB.Model(&Actress{}).Where("name in ?", actresses).Find(&exists)
+	common.DB.Model(&Actress{}).Where("name in ?", actresses).Find(&exists)
 	existMap := lo.Associate(exists, func(f Actress) (string, int) {
 		return f.Name, f.ID
 	})
@@ -72,7 +72,7 @@ func CreateActresses(actresses []string) []int {
 		}
 	}
 	if len(notExists) > 0 {
-		commom.DB.Create(&notExists)
+		common.DB.Create(&notExists)
 		for _, actress := range notExists {
 			ids = append(ids, actress.ID)
 		}
@@ -81,10 +81,10 @@ func CreateActresses(actresses []string) []int {
 }
 
 func deleteActress(model DeleteActressModel) (err error) {
-	if err = commom.DB.Delete(&Actress{}, model.ID).Error; err != nil {
+	if err = common.DB.Delete(&Actress{}, model.ID).Error; err != nil {
 		return err
 	}
-	if err = commom.DB.Delete(&actress_object.ActressObject{}, "actress_id in ?", model.ID).Error; err != nil {
+	if err = common.DB.Delete(&actress_object.ActressObject{}, "actress_id in ?", model.ID).Error; err != nil {
 		return err
 	}
 	return
@@ -106,5 +106,5 @@ type DeleteActressModel struct {
 }
 
 func AutoMigrate() {
-	_ = commom.DB.AutoMigrate(&Actress{})
+	_ = common.DB.AutoMigrate(&Actress{})
 }

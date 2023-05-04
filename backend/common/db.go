@@ -1,4 +1,4 @@
-package commom
+package common
 
 import (
 	"github.com/glebarez/sqlite"

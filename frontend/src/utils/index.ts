@@ -14,3 +14,7 @@ export default {
   }
 
 }
+
+export const parseJson = (str: string) => {
+  return str ? JSON.parse(str) : Array();
+}

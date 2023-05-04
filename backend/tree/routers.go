@@ -2,7 +2,8 @@ package tree
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/samber/lo"
+	"github.com/xi-mad/my_video/common"
 )
 
 func Register(router *gin.RouterGroup) {
@@ -15,14 +16,14 @@ func Register(router *gin.RouterGroup) {
 
 func ListTree(c *gin.Context) {
 	var trees []Tree
-	err := commom.DB.Find(&trees).Error
-	c.JSON(200, commom.CommonResultAuto(trees, err))
+	err := common.DB.Find(&trees).Error
+	c.JSON(200, common.CommonResultAuto(trees, err))
 }
 
 func CreateTree(c *gin.Context) {
 	var model CreateTreeModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	Tree := Tree{
@@ -30,14 +31,14 @@ func CreateTree(c *gin.Context) {
 		Order:    model.Order,
 		ParentID: model.ParentID,
 	}
-	err := commom.DB.Create(&Tree).Error
-	c.JSON(200, commom.CommonResultAuto(Tree, err))
+	err := common.DB.Create(&Tree).Error
+	c.JSON(200, common.CommonResultAuto(Tree, err))
 }
 
 func UpdateTree(c *gin.Context) {
 	var model UpdateTreeModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	Tree := Tree{
@@ -45,29 +46,30 @@ func UpdateTree(c *gin.Context) {
 		Name:  model.Name,
 		Order: model.Order,
 	}
-	err := commom.DB.Updates(&Tree).Error
-	c.JSON(200, commom.CommonResultAuto(Tree, err))
+	err := common.DB.Updates(&Tree).Error
+	c.JSON(200, common.CommonResultAuto(Tree, err))
 }
 
 func DeleteTree(c *gin.Context) {
 	var model DeleteTreeModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	c.JSON(200, commom.CommonResultAuto(nil, deleteActress(model)))
+	c.JSON(200, common.CommonResultAuto(nil, deleteActress(model)))
 }
 
 func Options(c *gin.Context) {
 	var trees []Tree
-	err := commom.DB.Model(&Tree{}).Select("id, name, parent_id").Find(&trees).Error
-	options := make([]commom.TreeSelectOption, 0)
-	for _, tree := range trees {
-		options = append(options, commom.TreeSelectOption{
+	if err := common.DB.Model(&Tree{}).Select("id, name, parent_id").Find(&trees).Error; err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+	c.JSON(200, common.CommonResultSuccess(lo.Map(trees, func(tree Tree, index int) common.TreeSelectOption {
+		return common.TreeSelectOption{
 			Value:    tree.ID,
 			Label:    tree.Name,
 			ParentID: tree.ParentID,
-		})
-	}
-	c.JSON(200, commom.CommonResultAuto(options, err))
+		}
+	})))
 }

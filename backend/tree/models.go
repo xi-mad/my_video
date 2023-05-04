@@ -2,7 +2,7 @@ package tree
 
 import (
 	"errors"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 	"github.com/xi-mad/my_video/object"
 	"time"
 )
@@ -21,7 +21,7 @@ func (t *Tree) TableName() string {
 }
 
 func listTree(parentID int) (trees []Tree, err error) {
-	err = commom.DB.Model(&Tree{}).Find(&trees, "parent_id = ?", parentID).Error
+	err = common.DB.Model(&Tree{}).Find(&trees, "parent_id = ?", parentID).Error
 	return
 }
 
@@ -33,10 +33,10 @@ func deleteActress(model DeleteTreeModel) (err error) {
 	if len(trees) > 0 {
 		return errors.New("该节点下有子节点，无法删除")
 	}
-	if err = commom.DB.Delete(&Tree{}, model.ID).Error; err != nil {
+	if err = common.DB.Delete(&Tree{}, model.ID).Error; err != nil {
 		return err
 	}
-	if err = commom.DB.Delete(&object.TreeObject{}, "tree_id = ?", model.ID).Error; err != nil {
+	if err = common.DB.Delete(&object.TreeObject{}, "tree_id = ?", model.ID).Error; err != nil {
 		return err
 	}
 	return
@@ -60,5 +60,5 @@ type DeleteTreeModel struct {
 }
 
 func AutoMigrate() {
-	_ = commom.DB.AutoMigrate(&Tree{})
+	_ = common.DB.AutoMigrate(&Tree{})
 }

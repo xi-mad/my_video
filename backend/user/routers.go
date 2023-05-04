@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 )
 
 func Register(r *gin.RouterGroup) {
@@ -16,11 +16,11 @@ func Login(c *gin.Context) {
 	lr := LoginResponse{
 		Token: "admin-token",
 	}
-	c.JSON(200, commom.CommonResultSuccess(lr))
+	c.JSON(200, common.CommonResultSuccess(lr))
 }
 
 func Logout(c *gin.Context) {
-	c.JSON(200, commom.CommonResultSuccess(nil))
+	c.JSON(200, common.CommonResultSuccess(nil))
 }
 
 func Info(c *gin.Context) {
@@ -30,7 +30,7 @@ func Info(c *gin.Context) {
 		Avatar: "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif",
 		Token:  "admin-token",
 	}
-	c.JSON(200, commom.CommonResultSuccess(ir))
+	c.JSON(200, common.CommonResultSuccess(ir))
 }
 
 func GetMenu(c *gin.Context) {
@@ -97,5 +97,5 @@ func GetMenu(c *gin.Context) {
 			}},
 		}},
 	})
-	c.JSON(200, commom.CommonResultSuccess(menu))
+	c.JSON(200, common.CommonResultSuccess(menu))
 }

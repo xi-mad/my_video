@@ -10,7 +10,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/xi-mad/my_video/actress"
 	"github.com/xi-mad/my_video/actress_object"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 	"github.com/xi-mad/my_video/media"
 	"github.com/xi-mad/my_video/tag"
 	"github.com/xi-mad/my_video/tag_object"
@@ -48,26 +48,26 @@ func LogObject(c *gin.Context) {
 		msg += fmt.Sprintf("%s\n", front.Value)
 		findLog.Remove(front)
 	}
-	c.JSON(200, commom.CommonResultSuccess(msg))
+	c.JSON(200, common.CommonResultSuccess(msg))
 }
 
 func ViewObjectInc(c *gin.Context) {
 	if id, exist := c.GetQuery("id"); !exist {
-		c.JSON(200, commom.CommonResultFailed(errors.New("id is empty")))
+		c.JSON(200, common.CommonResultFailed(errors.New("id is empty")))
 		return
 	} else {
-		if err := commom.DB.Model(&Object{}).Where("id = ?", id).Update("view_count", gorm.Expr("view_count + ?", 1)).Error; err != nil {
-			c.JSON(200, commom.CommonResultFailed(err))
+		if err := common.DB.Model(&Object{}).Where("id = ?", id).Update("view_count", gorm.Expr("view_count + ?", 1)).Error; err != nil {
+			c.JSON(200, common.CommonResultFailed(err))
 			return
 		}
 	}
-	c.JSON(200, commom.CommonResultSuccess(nil))
+	c.JSON(200, common.CommonResultSuccess(nil))
 	return
 }
 func VideoObject(c *gin.Context) {
 	var model PlayObjectModel
 	if err := c.ShouldBindQuery(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	c.File(model.Path)
@@ -77,35 +77,35 @@ func VideoObject(c *gin.Context) {
 func PlayObject(c *gin.Context) {
 	var model PlayObjectModel
 	if err := c.ShouldBindQuery(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	player := commom.DefaultConfig.Player.Path
+	player := common.DefaultConfig.Player.Path
 	if player == "" {
-		c.JSON(200, commom.CommonResultFailed(errors.New("player not set")))
+		c.JSON(200, common.CommonResultFailed(errors.New("player not set")))
 		return
 	}
-	err := util.ExecCmd(commom.DefaultConfig.Player.Path, model.Path)
-	c.JSON(200, commom.CommonResultAuto(nil, err))
+	err := util.ExecCmd(common.DefaultConfig.Player.Path, model.Path)
+	c.JSON(200, common.CommonResultAuto(nil, err))
 }
 
 func ListObject(c *gin.Context) {
 	var model ListObjectRequest
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	object, total, err := QueryObject(model)
 	if err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 
-	ids := commom.Map2ID(object)
+	ids := common.Map2ID(object)
 
 	thumbMap, err := QueryThumbnail(ids)
 	if err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	trees := QueryTree(ids)
@@ -149,7 +149,7 @@ func ListObject(c *gin.Context) {
 		result = append(result, lom)
 
 	}
-	c.JSON(200, commom.CommonResultSuccess(struct {
+	c.JSON(200, common.CommonResultSuccess(struct {
 		Total int64             `json:"total"`
 		List  []ListObjectModel `json:"data"`
 	}{
@@ -161,10 +161,10 @@ func ListObject(c *gin.Context) {
 func CreateObject(c *gin.Context) {
 	var model CreateObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	c.JSON(200, commom.CommonResultAuto(createObject(model)))
+	c.JSON(200, common.CommonResultAuto(createObject(model)))
 }
 
 func createObject(model CreateObjectModel) (object Object, err error) {
@@ -189,7 +189,7 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 		Release:     model.Release,
 		Label:       model.Label,
 	}
-	err = commom.DB.Save(&object).Error
+	err = common.DB.Save(&object).Error
 	if err != nil {
 		return
 	}
@@ -200,20 +200,20 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 		ObjectID:  object.ID,
 		Thumbnail: b64,
 	}
-	err = commom.DB.Save(&thumb).Error
+	err = common.DB.Save(&thumb).Error
 	return
 }
 
 func UpdateObject(c *gin.Context) {
 	var model UpdateObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	oldObj := Object{}
-	err := commom.DB.Find(&oldObj, model.ID).Error
+	err := common.DB.Find(&oldObj, model.ID).Error
 	if err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	object := Object{
@@ -227,56 +227,56 @@ func UpdateObject(c *gin.Context) {
 	if oldObj.Path != model.Path {
 		_, b64, err := detail(model.Path)
 		if err != nil {
-			c.JSON(200, commom.CommonResultFailed(err))
+			c.JSON(200, common.CommonResultFailed(err))
 			return
 		}
 		thumb := Thumbnail{
 			ID:        oldObj.ID,
 			Thumbnail: b64,
 		}
-		err = commom.DB.Updates(&thumb).Error
+		err = common.DB.Updates(&thumb).Error
 	}
 
-	err = commom.DB.Updates(&object).Error
+	err = common.DB.Updates(&object).Error
 	SaveObjectActress(object.ID, model.Actress)
 	SaveObjectTag(object.ID, model.Tag)
 	SaveObjectTree(object.ID, model.Tree)
-	c.JSON(200, commom.CommonResultAuto(object, err))
+	c.JSON(200, common.CommonResultAuto(object, err))
 }
 
 func DeleteObject(c *gin.Context) {
 	var model DeleteObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
-	err := commom.DB.Delete(&Object{}, model.ID).Error
+	err := common.DB.Delete(&Object{}, model.ID).Error
 	if err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	deleteRelationByObjectID(model.ID, &actress_object.ActressObject{})
 	deleteRelationByObjectID(model.ID, &tag_object.TagObject{})
 	deleteRelationByObjectID(model.ID, &TreeObject{})
 
-	err = commom.DB.Where("object_id in ?", model.ID).Delete(&Thumbnail{}).Error
-	c.JSON(200, commom.CommonResultAuto(nil, err))
+	err = common.DB.Where("object_id in ?", model.ID).Delete(&Thumbnail{}).Error
+	c.JSON(200, common.CommonResultAuto(nil, err))
 }
 
 func ScanObject(c *gin.Context) {
 	var model ScanObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	ap, err := filepath.Abs(model.Path)
 	if err != nil {
-		c.JSON(200, commom.CommonResultFailed(err))
+		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}
 	model.Path = ap
 	go scanObject(model)
-	c.JSON(200, commom.CommonResultAuto(ap, err))
+	c.JSON(200, common.CommonResultAuto(ap, err))
 }
 
 func scanObject(model ScanObjectModel) {
@@ -344,17 +344,17 @@ func scanObject(model ScanObjectModel) {
 					thumb := dir + "\\thumb.jpg"
 					fanartB64, err := util.Image2Base64(fanart)
 					if err == nil {
-						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+						common.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
 							Update("fanart", fanartB64)
 					}
 					posterB64, err := util.Image2Base64(poster)
 					if err == nil {
-						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+						common.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
 							Update("poster", posterB64)
 					}
 					thumbB64, err := util.Image2Base64(thumb)
 					if err == nil {
-						commom.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
+						common.DB.Model(&Thumbnail{}).Where("object_id = ?", obj.ID).
 							Update("thumb", thumbB64)
 					}
 				} else {
@@ -423,7 +423,7 @@ func thumbnailB64(fname, suffix string) (b64 string, err error) {
 }
 
 func thumbnail(path string, fsize int64, suffix string) (err error) {
-	thumbnailConf := commom.DefaultConfig.Thumbnail
+	thumbnailConf := common.DefaultConfig.Thumbnail
 	width, col, row := thumbnailConf.Width, thumbnailConf.Col, thumbnailConf.Row
 	for _, optional := range thumbnailConf.Optional {
 		if fsize <= optional.FSizeLess {

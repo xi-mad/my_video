@@ -4,7 +4,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"github.com/xi-mad/my_video/actress_object"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 	"github.com/xi-mad/my_video/tag_object"
 	"gorm.io/gorm"
 	"strconv"
@@ -110,11 +110,11 @@ func QueryObject(model ListObjectRequest) (object []Object, total int64, err err
 		})
 	}
 
-	if err := commom.DB.Model(&Object{}).Scopes(commom.PaginateQuery(&model)).Scopes(condition...).Find(&object).Error; err != nil {
+	if err := common.DB.Model(&Object{}).Scopes(common.PaginateQuery(&model)).Scopes(condition...).Find(&object).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if err := commom.DB.Model(&Object{}).Scopes(condition...).Count(&total).Error; err != nil {
+	if err := common.DB.Model(&Object{}).Scopes(condition...).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 	return
@@ -202,7 +202,7 @@ func (t *Thumbnail) TableName() string {
 
 func QueryThumbnail(ids []int) (res map[int]Thumbnail, err error) {
 	var thumb []Thumbnail
-	if err := commom.DB.Model(&Thumbnail{}).Find(&thumb, "object_id in ?", ids).Error; err != nil {
+	if err := common.DB.Model(&Thumbnail{}).Find(&thumb, "object_id in ?", ids).Error; err != nil {
 		return nil, err
 	}
 	res = make(map[int]Thumbnail)
@@ -224,15 +224,15 @@ func (t *TreeObject) TableName() string {
 }
 
 func AutoMigrate() {
-	_ = commom.DB.AutoMigrate(&Object{})
-	_ = commom.DB.AutoMigrate(&Thumbnail{})
-	_ = commom.DB.AutoMigrate(&tag_object.TagObject{})
-	_ = commom.DB.AutoMigrate(&actress_object.ActressObject{})
-	_ = commom.DB.AutoMigrate(&TreeObject{})
+	_ = common.DB.AutoMigrate(&Object{})
+	_ = common.DB.AutoMigrate(&Thumbnail{})
+	_ = common.DB.AutoMigrate(&tag_object.TagObject{})
+	_ = common.DB.AutoMigrate(&actress_object.ActressObject{})
+	_ = common.DB.AutoMigrate(&TreeObject{})
 }
 
 func SaveObjectTag(objectID int, tag []int) {
-	commom.DB.Where("object_id = ?", objectID).Delete(&tag_object.TagObject{})
+	common.DB.Where("object_id = ?", objectID).Delete(&tag_object.TagObject{})
 	if len(tag) == 0 {
 		return
 	}
@@ -240,11 +240,11 @@ func SaveObjectTag(objectID int, tag []int) {
 	for _, v := range tag {
 		to = append(to, tag_object.TagObject{TagID: v, ObjectID: objectID})
 	}
-	_ = commom.DB.Create(&to)
+	_ = common.DB.Create(&to)
 }
 
 func SaveObjectActress(objectID int, actress []int) {
-	commom.DB.Where("object_id = ?", objectID).Delete(&actress_object.ActressObject{})
+	common.DB.Where("object_id = ?", objectID).Delete(&actress_object.ActressObject{})
 	if len(actress) == 0 {
 		return
 	}
@@ -252,11 +252,11 @@ func SaveObjectActress(objectID int, actress []int) {
 	for _, v := range actress {
 		ao = append(ao, actress_object.ActressObject{ActressID: v, ObjectID: objectID})
 	}
-	_ = commom.DB.Create(&ao)
+	_ = common.DB.Create(&ao)
 }
 
 func SaveObjectTree(objectID int, tree []int) {
-	commom.DB.Where("object_id = ?", objectID).Delete(&TreeObject{})
+	common.DB.Where("object_id = ?", objectID).Delete(&TreeObject{})
 	if len(tree) == 0 {
 		return
 	}
@@ -264,12 +264,12 @@ func SaveObjectTree(objectID int, tree []int) {
 	for _, v := range tree {
 		to = append(to, TreeObject{TreeID: v, ObjectID: objectID})
 	}
-	_ = commom.DB.Create(&to)
+	_ = common.DB.Create(&to)
 }
 
 func deleteRelationByObjectID(objectId []int, t interface{}) {
 	if len(objectId) > 0 {
-		commom.DB.Delete(t, "object_id in ?", objectId)
+		common.DB.Delete(t, "object_id in ?", objectId)
 	}
 }
 
@@ -278,7 +278,7 @@ func QueryTags(objectID []int) map[int][]int {
 		return map[int][]int{}
 	}
 	var tag []tag_object.TagObject
-	if err := commom.DB.Model(&tag_object.TagObject{}).Where("object_id in (?)", objectID).Find(&tag).Error; err != nil {
+	if err := common.DB.Model(&tag_object.TagObject{}).Where("object_id in (?)", objectID).Find(&tag).Error; err != nil {
 		return map[int][]int{}
 	}
 	res := make(map[int][]int)
@@ -293,7 +293,7 @@ func QueryActress(objectID []int) map[int][]int {
 		return map[int][]int{}
 	}
 	var actress []actress_object.ActressObject
-	if err := commom.DB.Model(&actress_object.ActressObject{}).Where("object_id in (?)", objectID).Find(&actress).Error; err != nil {
+	if err := common.DB.Model(&actress_object.ActressObject{}).Where("object_id in (?)", objectID).Find(&actress).Error; err != nil {
 		return map[int][]int{}
 	}
 	res := make(map[int][]int)
@@ -308,7 +308,7 @@ func QueryTree(objectID []int) map[int][]int {
 		return map[int][]int{}
 	}
 	var tree []TreeObject
-	if err := commom.DB.Model(&TreeObject{}).Where("object_id in (?)", objectID).Find(&tree).Error; err != nil {
+	if err := common.DB.Model(&TreeObject{}).Where("object_id in (?)", objectID).Find(&tree).Error; err != nil {
 		return map[int][]int{}
 	}
 	res := make(map[int][]int)
@@ -320,7 +320,7 @@ func QueryTree(objectID []int) map[int][]int {
 
 func PathExist(path string) (bool, error) {
 	var count int64
-	if err := commom.DB.Model(&Object{}).Where("path = ?", path).Count(&count).Error; err != nil {
+	if err := common.DB.Model(&Object{}).Where("path = ?", path).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil

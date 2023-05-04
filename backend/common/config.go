@@ -1,4 +1,4 @@
-package commom
+package common
 
 import (
 	"log"
@@ -15,9 +15,11 @@ type Config struct {
 	Player    Player    `yaml:"player"`
 }
 type App struct {
-	Mode       string `yaml:"mode"`
-	Port       string `yaml:"port"`
-	ServerMode bool   `yaml:"server-mode"`
+	Mode             string `yaml:"mode"`
+	Port             string `yaml:"port"`
+	ServerMode       bool   `yaml:"server-mode"`
+	ObjectHeight     string `yaml:"object-height"`
+	CollectionHeight string `yaml:"collection-height"`
 }
 
 type Sqlite struct {

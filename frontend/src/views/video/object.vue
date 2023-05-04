@@ -70,6 +70,7 @@
       <a-divider/>
       <a-button-group>
         <a-button type="primary" @click="create">新建对象</a-button>
+        <a-button v-if="manageMode"  type="primary" @click="showCollectionModal">添加到集合</a-button>
         <a-popconfirm v-if="manageMode" title="确认删除" @confirm="deleteSelect">
           <a-button type="danger">删除选中</a-button>
         </a-popconfirm>
@@ -162,6 +163,16 @@
               <a href="#" :title="record.description">{{record.description.substring(0, 20)}}</a>
             </template>
             <template v-else-if="column.dataIndex === 'action'">
+              <a-button size="small"  @click="playInBrowser(record)">
+                <template #icon>
+                  <PlayCircleOutlined />
+                </template>
+              </a-button>
+              <a-button size="small"  @click="playInOS(record)">
+                <template #icon>
+                  <PlaySquareOutlined/>
+                </template>
+              </a-button>
               <a-button size="small" type="primary" @click="updateRecord(record)">
                 <template #icon>
                   <EditOutlined/>
@@ -184,7 +195,7 @@
           <a-image-preview-group>
             <ul class="custom_container">
               <template v-for="(object, index) in objects" :key="index">
-                <li class="custom_card">
+                <li class="custom_card" :style="'height:' + config.objectHeight">
                   <a-image v-if="object.exist_nfo && showImage === 'thumb'" :src="'data:image/jpg;base64,' + object.thumb"/>
                   <a-image v-if="object.exist_nfo && showImage === 'poster'" :src="'data:image/jpg;base64,' + object.poster"/>
                   <a-image v-if="object.exist_nfo && showImage === 'fanart'" :src="'data:image/jpg;base64,' + object.fanart"/>
@@ -233,6 +244,13 @@
                           <EditOutlined/>
                         </template>
                       </a-button>
+                      <a-popconfirm title="确认删除" @confirm="deleteRecord(object.id)">
+                        <a-button size="small" type="danger">
+                          <template #icon>
+                            <DeleteOutlined/>
+                          </template>
+                        </a-button>
+                      </a-popconfirm>
                     </a-button-group>
                   </a-row>
                 </li>
@@ -321,6 +339,18 @@
         <vue3VideoPlay ref="player" v-bind="options"/>
       </div>
     </a-modal>
+    <a-modal v-model:visible="add2CollectionVisible" title="添加到集合" @ok="add2Collection" :maskClosable="false" :keyboard="false">
+      <a-form :label-col="{ style: { width: '150px' } }" :wrapper-col="{ span: 14 }">
+        <a-form-item label="集合">
+          <a-select
+              v-model:value="collectionId"
+              style="width: 100%"
+              :filter-option="filterOption"
+              :options="collectionOptions"
+          ></a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -333,11 +363,16 @@ import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
 import {optionsTree} from "@/api/tree";
 import {buildTree} from "@/utils/util";
+import {getConfig} from "@/api/config";
+import {optionsCollection, associateCollection} from "@/api/collection";
 
+const config = ref<any>({});
 const showImage = ref<string>("thumbnail");
 
 const videoVisible = ref<boolean>(false);
 const player = ref<any>();
+const add2CollectionVisible = ref<boolean>(false);
+const collectionId = ref<any>();
 
 const options = reactive({
   width: '100%', //播放器高度
@@ -515,6 +550,29 @@ const deleteSelect = () => {
   });
 };
 
+const showCollectionModal = () => {
+  if (selectedRowKeys.value.length === 0) {
+    message.warning('请选择要添加的对象');
+    return;
+  }
+  add2CollectionVisible.value = true
+}
+
+const add2Collection = () => {
+  if (collectionId.value === 0) {
+    message.warning('请选择要添加的合集');
+    return;
+  }
+
+  associateCollection({
+    collection_id: collectionId.value,
+    object_id: selectedRowKeys.value
+  }).then(() => {
+    message.success("添加成功");
+    add2CollectionVisible.value = false;
+  });
+}
+
 const selectedRowKeys = ref<any[]>([]);
 const onSelectChange = (rowKeys: any[]) => {
   selectedRowKeys.value = rowKeys;
@@ -575,6 +633,7 @@ const objects = ref<any[]>([]);
 const actressOptions = ref<any[]>([]);
 const tagOptions = ref<any[]>([]);
 const treeOptions = ref<any[]>([]);
+const collectionOptions = ref<any[]>([]);
 
 const treeMap = {};
 const actressMap = {};
@@ -619,6 +678,12 @@ const refresh = () => {
 };
 
 onMounted(() => {
+  getConfig().then((res) => {
+    config.value = res.data.data;
+  });
+  optionsCollection().then((res) => {
+    collectionOptions.value = res.data.data;
+  });
   optionsActress().then((res) => {
     actressOptions.value = res.data.data;
     res.data.data.forEach((item: any) => {

@@ -12,9 +12,13 @@ func PrepareBackgroundCommand(cmd *exec.Cmd) {
 }
 
 func OpenFolder(path string) error {
-	return exec.Command("explorer.exe", path).Start()
+	cmd := exec.Command("explorer.exe", path)
+	PrepareBackgroundCommand(cmd)
+	return cmd.Start()
 }
 
 func OpenInBrowser(url string) error {
-	return exec.Command("cmd", `/c`, `start`, url).Start()
+	cmd := exec.Command("cmd", `/c`, `start`, url)
+	PrepareBackgroundCommand(cmd)
+	return cmd.Start()
 }

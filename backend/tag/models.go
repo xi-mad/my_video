@@ -3,7 +3,7 @@ package tag
 import (
 	"errors"
 	"github.com/samber/lo"
-	"github.com/xi-mad/my_video/commom"
+	"github.com/xi-mad/my_video/common"
 	"github.com/xi-mad/my_video/tag_object"
 	"strings"
 	"time"
@@ -28,7 +28,7 @@ func createTag(model CreateTagModel) (err error) {
 			continue
 		}
 		var count int64
-		err := commom.DB.Model(&Tag{}).Where("name = ?", name).Count(&count).Error
+		err := common.DB.Model(&Tag{}).Where("name = ?", name).Count(&count).Error
 		if err != nil {
 			errorMsg += err.Error() + ";\n"
 		}
@@ -36,7 +36,7 @@ func createTag(model CreateTagModel) (err error) {
 			errorMsg += name + "标签已存在;\n"
 			continue
 		}
-		if err = commom.DB.Create(&Tag{
+		if err = common.DB.Create(&Tag{
 			Name:  name,
 			Order: model.Order,
 		}).Error; err != nil {
@@ -52,7 +52,7 @@ func createTag(model CreateTagModel) (err error) {
 func CreateTags(tags []string) []int {
 	ids := make([]int, 0)
 	exists := make([]Tag, 0)
-	commom.DB.Model(&Tag{}).Where("name in ?", tags).Find(&exists)
+	common.DB.Model(&Tag{}).Where("name in ?", tags).Find(&exists)
 	existMap := lo.Associate(exists, func(f Tag) (string, int) {
 		return f.Name, f.ID
 	})
@@ -68,7 +68,7 @@ func CreateTags(tags []string) []int {
 		}
 	}
 	if len(notExists) > 0 {
-		commom.DB.Create(&notExists)
+		common.DB.Create(&notExists)
 		for _, tag := range notExists {
 			ids = append(ids, tag.ID)
 		}
@@ -77,10 +77,10 @@ func CreateTags(tags []string) []int {
 }
 
 func deleteTag(model DeleteTagModel) (err error) {
-	if err = commom.DB.Delete(&Tag{}, model.ID).Error; err != nil {
+	if err = common.DB.Delete(&Tag{}, model.ID).Error; err != nil {
 		return err
 	}
-	if err = commom.DB.Delete(&tag_object.TagObject{}, "tag_id in ?", model.ID).Error; err != nil {
+	if err = common.DB.Delete(&tag_object.TagObject{}, "tag_id in ?", model.ID).Error; err != nil {
 		return err
 	}
 	return
@@ -106,5 +106,5 @@ type DeleteTagModel struct {
 }
 
 func AutoMigrate() {
-	_ = commom.DB.AutoMigrate(&Tag{})
+	_ = common.DB.AutoMigrate(&Tag{})
 }

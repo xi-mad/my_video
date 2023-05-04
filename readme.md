@@ -11,8 +11,6 @@
 ### 下一步计划
 - [ ] 记录导入记录，提供更精细化的管理方式
 - [ ] 配置移动到项目中 [issue #1](https://github.com/xi-mad/my_video/issues/1)
-- [ ] 评分+排序
-- [ ] 增加合集管理
 - [ ] 代码优化 
 
 
@@ -34,6 +32,8 @@
 - [x] 支持nfo文件 [issue #2](https://github.com/xi-mad/my_video/issues/2)
 - [x] 记录日志，存入到log文件夹
 - [x] 启动通知，尽力而为
+- [x] 增加合集管理
+- [x] 评分+排序
 
 ### mtn工具
 https://moviethumbnail.sourceforge.net/

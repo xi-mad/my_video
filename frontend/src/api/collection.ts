@@ -16,6 +16,13 @@ export const listCollection = (data: any) => {
     })
 }
 
+export const getCollection = (id: any) => {
+    return request({
+        url: '/api/collection/get?id=' + id,
+        method: 'get',
+    })
+}
+
 export const updateCollection = (data: any) => {
     return request({
         url: '/api/collection/',
@@ -42,6 +49,14 @@ export const optionsCollection = () => {
 export const associateCollection = (data: any) => {
     return request({
         url: '/api/collection/associate',
+        method: 'post',
+        data
+    })
+}
+
+export const disassociateCollection = (data: any) => {
+    return request({
+        url: '/api/collection/disassociate',
         method: 'post',
         data
     })

@@ -88,6 +88,11 @@
                   </a-row>
                   <a-row style="margin-top: 5px">
                     <a-button-group>
+                      <a-button size="small" @click="() => {router.push({path: '/video/object', query: {collection: collection.id}})}">
+                        <template #icon>
+                          <appstore-outlined />
+                        </template>
+                      </a-button>
                       <a-button size="small" type="primary" @click="updateRecord(collection)">
                         <template #icon>
                           <EditOutlined/>
@@ -155,12 +160,15 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
 import {listCollection, createCollection, updateCollection, deleteCollection, detailCollection} from "@/api/collection";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import {DeleteOutlined, EditOutlined, PlusOutlined, AppstoreOutlined} from '@ant-design/icons-vue';
 import {message} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
 import {optionsTag} from "@/api/tag";
 import {parseJson} from "@/utils";
 import {getConfig} from "@/api/config";
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const manageMode = ref<boolean>(false);
 const config = ref<any>({});
@@ -335,10 +343,6 @@ const refresh = () => {
 
 
 onMounted(() => {
-  detailCollection(1).then((res) => {
-    console.log(res.data.data);
-  });
-
   getConfig().then((res) => {
     config.value = res.data.data;
   });

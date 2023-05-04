@@ -52,13 +52,14 @@ type PlayObjectModel struct {
 }
 
 type ListObjectRequest struct {
-	Path     string `json:"path"`
-	Actress  []int  `json:"actress"`
-	Tag      []int  `json:"tag"`
-	NFO      bool   `json:"nfo"`
-	Tree     []int  `json:"tree"`
-	Page     int    `json:"page"`
-	PageSize int    `json:"page_size"`
+	Path       string `json:"path"`
+	Actress    []int  `json:"actress"`
+	Tag        []int  `json:"tag"`
+	NFO        bool   `json:"nfo"`
+	Tree       []int  `json:"tree"`
+	Collection string `json:"collection"`
+	Page       int    `json:"page"`
+	PageSize   int    `json:"page_size"`
 }
 
 func (l *ListObjectRequest) Pageable() (limit, offset int) {
@@ -107,6 +108,11 @@ func QueryObject(model ListObjectRequest) (object []Object, total int64, err err
 	if model.NFO {
 		condition = append(condition, func(db *gorm.DB) *gorm.DB {
 			return db.Where("exist_nfo = ?", model.NFO)
+		})
+	}
+	if model.Collection != "" {
+		condition = append(condition, func(db *gorm.DB) *gorm.DB {
+			return db.Where("id in (select object_id from object_collection where collection_id = ?)", model.Collection)
 		})
 	}
 

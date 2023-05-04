@@ -8,12 +8,38 @@ import (
 
 func Register(r *gin.RouterGroup) {
 	r.GET("/", ListCollection)
+	r.GET("/get", GetCollection)
 	r.POST("/", CreateCollection)
 	r.PUT("/", UpdateCollection)
 	r.DELETE("/", DeleteCollection)
 	r.GET("/options", OptionCollection)
 	r.POST("/associate", AssociateCollection)
+	r.POST("/disassociate", DisassociateCollection)
 	r.GET("/detail", DetailCollection)
+}
+
+func GetCollection(c *gin.Context) {
+	type GetCollectionRequest struct {
+		ID int `form:"id"`
+	}
+	var model GetCollectionRequest
+	if err := c.ShouldBindQuery(&model); err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+	var res Collection
+	if err := common.DB.Where("id = ?", model.ID).First(&res).Error; err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+	c.JSON(200, common.CommonResultSuccess(ListCollectionModel{
+		ID:         res.ID,
+		Name:       res.Name,
+		Cover:      res.Cover,
+		Labels:     res.Labels,
+		Actress:    res.Actress,
+		CreateTime: res.CreateTime,
+	}))
 }
 
 func ListCollection(c *gin.Context) {
@@ -161,6 +187,24 @@ func AssociateCollection(c *gin.Context) {
 		return
 	}
 	if err := common.DB.Create(oc).Error; err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+	c.JSON(200, common.CommonResultSuccess(nil))
+}
+
+func DisassociateCollection(c *gin.Context) {
+	type DisassociateCollectionRequest struct {
+		CollectionID string `json:"collection_id"`
+		ObjectID     []int  `json:"object_id"`
+	}
+	var req DisassociateCollectionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(200, common.CommonResultFailed(err))
+		return
+	}
+
+	if err := common.DB.Where("collection_id = ? and object_id in ?", req.CollectionID, req.ObjectID).Delete(&ObjectCollection{}).Error; err != nil {
 		c.JSON(200, common.CommonResultFailed(err))
 		return
 	}

@@ -147,7 +147,6 @@ func ListObject(c *gin.Context) {
 			lom.Tree = trees[v.ID]
 		}
 		result = append(result, lom)
-
 	}
 	c.JSON(200, common.CommonResultSuccess(struct {
 		Total int64             `json:"total"`

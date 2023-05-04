@@ -68,9 +68,16 @@
         </a-space>
       </a-form-item>
       <a-divider/>
+      <a-descriptions v-if="collectionInfo.name" :title="'合集名称：' + collectionInfo.name">
+        <a-descriptions-item><a-image :width="150" :src="collectionInfo.cover"/></a-descriptions-item>
+      </a-descriptions>
+      <a-divider v-if="collectionInfo.name"/>
       <a-button-group>
         <a-button type="primary" @click="create">新建对象</a-button>
         <a-button v-if="manageMode"  type="primary" @click="showCollectionModal">添加到集合</a-button>
+        <a-popconfirm v-if="manageMode && collection" title="确认移除" @confirm="deleteFromCollection">
+          <a-button type="danger">从合集中移除</a-button>
+        </a-popconfirm>
         <a-popconfirm v-if="manageMode" title="确认删除" @confirm="deleteSelect">
           <a-button type="danger">删除选中</a-button>
         </a-popconfirm>
@@ -364,7 +371,13 @@ import {optionsTag} from "@/api/tag";
 import {optionsTree} from "@/api/tree";
 import {buildTree} from "@/utils/util";
 import {getConfig} from "@/api/config";
-import {optionsCollection, associateCollection} from "@/api/collection";
+import {optionsCollection, associateCollection, disassociateCollection, getCollection} from "@/api/collection";
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+let collection = null;
+const collectionInfo = ref<any>({});
 
 const config = ref<any>({});
 const showImage = ref<string>("thumbnail");
@@ -372,7 +385,7 @@ const showImage = ref<string>("thumbnail");
 const videoVisible = ref<boolean>(false);
 const player = ref<any>();
 const add2CollectionVisible = ref<boolean>(false);
-const collectionId = ref<any>();
+const collectionId = ref<any>('');
 
 const options = reactive({
   width: '100%', //播放器高度
@@ -550,6 +563,19 @@ const deleteSelect = () => {
   });
 };
 
+const deleteFromCollection = () => {
+  if (selectedRowKeys.value.length === 0) {
+    message.warning('请选择要删除的对象');
+    return;
+  }
+  disassociateCollection({
+    collection_id: collection,
+    object_id: selectedRowKeys.value
+  }).then(() => {
+    refresh();
+  });
+};
+
 const showCollectionModal = () => {
   if (selectedRowKeys.value.length === 0) {
     message.warning('请选择要添加的对象');
@@ -559,7 +585,7 @@ const showCollectionModal = () => {
 }
 
 const add2Collection = () => {
-  if (collectionId.value === 0) {
+  if (collectionId.value === '') {
     message.warning('请选择要添加的合集');
     return;
   }
@@ -670,6 +696,7 @@ const refresh = () => {
     tag: searchValue.value.tag,
     tree: searchValue.value.tree,
     nfo: searchValue.value.nfo,
+    collection: route.query.collection,
   };
   listObject(data).then((res) => {
     objects.value = res.data.data.data;
@@ -678,6 +705,13 @@ const refresh = () => {
 };
 
 onMounted(() => {
+  if (route.query.collection) {
+    collection = route.query.collection;
+    getCollection(collection).then((res) => {
+      collectionInfo.value = res.data.data
+    });
+  }
+
   getConfig().then((res) => {
     config.value = res.data.data;
   });

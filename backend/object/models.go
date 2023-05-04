@@ -116,7 +116,7 @@ func QueryObject(model ListObjectRequest) (object []Object, total int64, err err
 		})
 	}
 
-	if err := common.DB.Model(&Object{}).Scopes(common.PaginateQuery(&model)).Scopes(condition...).Find(&object).Error; err != nil {
+	if err := common.DB.Model(&Object{}).Scopes(common.PaginateQuery(&model)).Scopes(condition...).Order("rating desc").Find(&object).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -136,7 +136,7 @@ type ListObjectModel struct {
 	Path        string    `json:"path"`
 	Magnet      string    `json:"magnet"`
 	ExistNFO    bool      `json:"exist_nfo"`
-	Rating      float64   `json:"rating"`
+	Rating      RateScore `json:"rating"`
 	Release     string    `json:"release"`
 	Label       string    `json:"label"`
 	Ext         string    `json:"ext"`
@@ -152,33 +152,33 @@ type ListObjectModel struct {
 }
 
 type CreateObjectModel struct {
-	Type        string  `json:"type"`
-	Num         string  `json:"num"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Path        string  `json:"path"`
-	ExistNFO    bool    `json:"exist_nfo"`
-	Rating      float64 `json:"rating"`
-	Release     string  `json:"release"`
-	Label       string  `json:"label"`
-	Magnet      string  `json:"magnet"`
-	Actress     []int   `json:"actress"`
-	Tag         []int   `json:"tag"`
-	Tree        []int   `json:"tree"`
+	Type        string    `json:"type"`
+	Num         string    `json:"num"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Path        string    `json:"path"`
+	ExistNFO    bool      `json:"exist_nfo"`
+	Rating      RateScore `json:"rating"`
+	Release     string    `json:"release"`
+	Label       string    `json:"label"`
+	Magnet      string    `json:"magnet"`
+	Actress     []int     `json:"actress"`
+	Tag         []int     `json:"tag"`
+	Tree        []int     `json:"tree"`
 }
 
 type UpdateObjectModel struct {
-	ID          int     `json:"id"`
-	Type        string  `json:"type"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Path        string  `json:"path"`
-	ExistNFO    bool    `json:"exist_nfo"`
-	Rating      float64 `json:"rating"`
-	Magnet      string  `json:"magnet"`
-	Actress     []int   `json:"actress"`
-	Tag         []int   `json:"tag"`
-	Tree        []int   `json:"tree"`
+	ID          int       `json:"id"`
+	Type        string    `json:"type"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Path        string    `json:"path"`
+	ExistNFO    bool      `json:"exist_nfo"`
+	Rating      RateScore `json:"rating"`
+	Magnet      string    `json:"magnet"`
+	Actress     []int     `json:"actress"`
+	Tag         []int     `json:"tag"`
+	Tree        []int     `json:"tree"`
 }
 
 type DeleteObjectModel struct {

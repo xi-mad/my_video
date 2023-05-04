@@ -291,6 +291,9 @@
               :options="actressOptions"
           ></a-select>
         </a-form-item>
+        <a-form-item label="评分">
+          <a-input-number id="inputNumber" v-model:value="object.rating" :min="0" :max="10" />
+        </a-form-item>
         <a-form-item label="标签">
           <a-select
               v-model:value="object.tag"
@@ -451,6 +454,7 @@ const modalTitle = ref<string>('');
 const empty = {
   id: 0,
   name: '',
+  rating: 0,
   description: '',
   path: '',
   magnet: '',
@@ -480,6 +484,7 @@ const submit = () => {
     if (object.value.id === 0) {
       createObject({
         name: object.value.name,
+        rating: object.value.rating,
         description: object.value.description,
         path: object.value.path,
         magnet: object.value.magnet,
@@ -494,6 +499,7 @@ const submit = () => {
       updateObject({
         id: object.value.id,
         name: object.value.name,
+        rating: object.value.rating,
         description: object.value.description,
         path: object.value.path,
         magnet: object.value.magnet,
@@ -535,6 +541,7 @@ const updateRecord = (record: any) => {
   object.value = {
     id: record.id,
     name: record.name,
+    rating: record.rating,
     description: record.description,
     path: record.path,
     magnet: record.magnet,
@@ -624,6 +631,11 @@ const columns = [
     title: '名称',
     dataIndex: 'name',
     key: 'name',
+  },
+  {
+    title: '评分',
+    dataIndex: 'rating',
+    key: 'rating',
   },
   {
     title: '描述',

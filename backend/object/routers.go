@@ -128,6 +128,7 @@ func ListObject(c *gin.Context) {
 			Label:       v.Label,
 			Ext:         v.Ext,
 			ViewCount:   v.ViewCount,
+			Rating:      v.Rating,
 			Actress:     []int{},
 			Tag:         []int{},
 			Tree:        []int{},
@@ -221,6 +222,7 @@ func UpdateObject(c *gin.Context) {
 		Name:        model.Name,
 		Description: model.Description,
 		Path:        model.Path,
+		Rating:      model.Rating,
 		Magnet:      model.Magnet,
 	}
 	if oldObj.Path != model.Path {
@@ -331,7 +333,7 @@ func scanObject(model ScanObjectModel) {
 						Num:         m.Number,
 						Release:     m.Release,
 						Label:       m.Label,
-						Rating:      rating,
+						Rating:      RateScore(rating),
 					})
 					if err != nil {
 						findLog.PushBack(fmt.Sprintf(errMsgFormat, fpath, err.Error()))

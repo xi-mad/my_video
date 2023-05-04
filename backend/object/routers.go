@@ -18,6 +18,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -36,6 +37,7 @@ func Register(router *gin.RouterGroup) {
 	router.GET("/log", LogObject)
 	router.GET("/video", VideoObject)
 	router.GET("/viewinc", ViewObjectInc)
+	router.GET("/random", RandomObject)
 }
 
 var findLog = list.New()
@@ -454,4 +456,17 @@ func thumbnail(path string, fsize int64, suffix string) (err error) {
 		log.Printf("mtn error: %s \n", err)
 	}
 	return
+}
+
+func RandomObject(c *gin.Context) {
+	var obj Object
+	if err := common.DB.Model(&Object{}).Order("random()").Limit(1).First(&obj).Error; err != nil {
+		c.JSON(http.StatusOK, common.CommonResultFailed(err))
+		return
+	}
+	if err := common.DB.Model(&Object{}).Where("id = ?", obj.ID).Update("view_count", obj.ViewCount+1).Error; err != nil {
+		c.JSON(http.StatusOK, common.CommonResultFailed(err))
+		return
+	}
+	c.JSON(http.StatusOK, common.CommonResultSuccess(obj))
 }

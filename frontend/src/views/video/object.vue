@@ -130,6 +130,8 @@
           <a-button type="primary">路径扫描</a-button>
         </a-popover>
         <a-button @click="() => {logVisible = true}">扫描日志</a-button>
+        <a-button @click="randomPlay">随机播放</a-button>
+
       </a-button-group>
       <a-divider/>
       <a-pagination
@@ -366,7 +368,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, reactive} from 'vue';
-import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc} from "@/api/object";
+import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc, randomPath} from "@/api/object";
 import {DeleteOutlined, EditOutlined, PlaySquareOutlined, PlayCircleOutlined} from '@ant-design/icons-vue';
 import {message, TreeSelect} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
@@ -528,6 +530,15 @@ const playInBrowser = (record: any) => {
   options.poster = 'data:image/jpg;base64,' + record.thumbnail;
   options.src = videoPath(record.path);
   viewinc(record.id).then(response => {});
+};
+
+const randomPlay = () => {
+  randomPath().then(response => {
+    options.title = response.data.data.name;
+    options.poster = 'data:image/jpg;base64,' + response.data.data.thumbnail;
+    options.src = videoPath(response.data.data.path);
+    videoVisible.value = true;
+  });
 };
 
 const stopPlay = () => {

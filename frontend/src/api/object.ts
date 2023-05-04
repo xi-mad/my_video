@@ -66,3 +66,10 @@ export const viewinc = (id: any) => {
         method: 'get'
     })
 }
+
+export const randomPath = () => {
+    return request({
+        url: '/api/object/random',
+        method: 'get'
+    })
+}

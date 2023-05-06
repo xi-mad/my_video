@@ -80,10 +80,10 @@ func onReady() {
 			select {
 			case <-logFolder.ClickedCh:
 				dir, _ := os.Getwd()
-				_ = plantform.OpenFolder(dir + "\\log")
+				plantform.OpenFolder(dir + "\\log")
 			case <-configFolder.ClickedCh:
 				dir, _ := os.Getwd()
-				_ = plantform.OpenFolder(dir + "\\config")
+				plantform.OpenFolder(dir + "\\config")
 			case <-webPage.ClickedCh:
 				openInBrowser()
 			case <-mQuit.ClickedCh:
@@ -95,10 +95,7 @@ func onReady() {
 }
 
 func openInBrowser() {
-	err := plantform.OpenInBrowser("http://127.0.0.1:" + conf.DefaultConfig.App.Port)
-	if err != nil {
-		log.Println(err)
-	}
+	plantform.OpenInBrowser("http://127.0.0.1:" + conf.DefaultConfig.App.Port)
 }
 
 func aNotify() {

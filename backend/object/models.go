@@ -167,24 +167,6 @@ type CreateObjectModel struct {
 	Tree        []int     `json:"tree"`
 }
 
-type UpdateObjectModel struct {
-	ID          int       `json:"id"`
-	Type        string    `json:"type"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Path        string    `json:"path"`
-	ExistNFO    bool      `json:"exist_nfo"`
-	Rating      RateScore `json:"rating"`
-	Magnet      string    `json:"magnet"`
-	Actress     []int     `json:"actress"`
-	Tag         []int     `json:"tag"`
-	Tree        []int     `json:"tree"`
-}
-
-type DeleteObjectModel struct {
-	ID []int `json:"id"`
-}
-
 type ScanObjectModel struct {
 	Path    string `json:"path"`
 	Actress []int  `json:"actress"`

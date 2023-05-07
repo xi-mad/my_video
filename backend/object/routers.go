@@ -207,6 +207,19 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 }
 
 func UpdateObject(c *gin.Context) {
+	type UpdateObjectModel struct {
+		ID          int       `json:"id"`
+		Type        string    `json:"type"`
+		Name        string    `json:"name"`
+		Description string    `json:"description"`
+		Path        string    `json:"path"`
+		ExistNFO    bool      `json:"exist_nfo"`
+		Rating      RateScore `json:"rating"`
+		Magnet      string    `json:"magnet"`
+		Actress     []int     `json:"actress"`
+		Tag         []int     `json:"tag"`
+		Tree        []int     `json:"tree"`
+	}
 	var model UpdateObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
 		c.JSON(200, common.CommonResultFailed(err))
@@ -248,6 +261,9 @@ func UpdateObject(c *gin.Context) {
 }
 
 func DeleteObject(c *gin.Context) {
+	type DeleteObjectModel struct {
+		ID []int `json:"id"`
+	}
 	var model DeleteObjectModel
 	if err := c.ShouldBindJSON(&model); err != nil {
 		c.JSON(200, common.CommonResultFailed(err))

@@ -52,6 +52,7 @@ type PlayObjectModel struct {
 }
 
 type ListObjectRequest struct {
+	Filename   string `json:"filename"`
 	Path       string `json:"path"`
 	Actress    []int  `json:"actress"`
 	Tag        []int  `json:"tag"`
@@ -76,6 +77,11 @@ func (l *ListObjectRequest) Pageable() (limit, offset int) {
 
 func QueryObject(model ListObjectRequest) (object []Object, total int64, err error) {
 	var condition []func(db *gorm.DB) *gorm.DB
+	if model.Filename != "" {
+		condition = append(condition, func(db *gorm.DB) *gorm.DB {
+			return db.Where("name like ?", fmt.Sprintf("%%%s%%", model.Filename))
+		})
+	}
 	if model.Path != "" {
 		condition = append(condition, func(db *gorm.DB) *gorm.DB {
 			return db.Where("path like ?", fmt.Sprintf("%%%s%%", model.Path))
@@ -219,8 +225,10 @@ func AutoMigrate() {
 	_ = common.DB.AutoMigrate(&TreeObject{})
 }
 
-func SaveObjectTag(objectID int, tag []int) {
-	common.DB.Where("object_id = ?", objectID).Delete(&tag_object.TagObject{})
+func SaveObjectTag(objectID int, tag []int, deleteOld bool) {
+	if deleteOld {
+		common.DB.Where("object_id = ?", objectID).Delete(&tag_object.TagObject{})
+	}
 	if len(tag) == 0 {
 		return
 	}
@@ -231,8 +239,10 @@ func SaveObjectTag(objectID int, tag []int) {
 	_ = common.DB.Create(&to)
 }
 
-func SaveObjectActress(objectID int, actress []int) {
-	common.DB.Where("object_id = ?", objectID).Delete(&actress_object.ActressObject{})
+func SaveObjectActress(objectID int, actress []int, deleteOld bool) {
+	if deleteOld {
+		common.DB.Where("object_id = ?", objectID).Delete(&actress_object.ActressObject{})
+	}
 	if len(actress) == 0 {
 		return
 	}
@@ -243,8 +253,10 @@ func SaveObjectActress(objectID int, actress []int) {
 	_ = common.DB.Create(&ao)
 }
 
-func SaveObjectTree(objectID int, tree []int) {
-	common.DB.Where("object_id = ?", objectID).Delete(&TreeObject{})
+func SaveObjectTree(objectID int, tree []int, deleteOld bool) {
+	if deleteOld {
+		common.DB.Where("object_id = ?", objectID).Delete(&TreeObject{})
+	}
 	if len(tree) == 0 {
 		return
 	}

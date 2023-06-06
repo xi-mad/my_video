@@ -73,3 +73,11 @@ export const randomPath = () => {
         method: 'get'
     })
 }
+
+export const addTags = (data: any) => {
+    return request({
+        url: '/api/object/addTags',
+        method: 'post',
+        data
+    })
+}

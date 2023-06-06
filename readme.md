@@ -33,6 +33,7 @@
 - [x] 启动通知，尽力而为
 - [x] 增加合集管理
 - [x] 评分+排序
+- [x] 批量对对象新增标记，仅仅新增
 
 ### mtn工具
 https://moviethumbnail.sourceforge.net/

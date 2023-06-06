@@ -5,7 +5,9 @@
         <a-switch v-model:checked="manageMode"/>
       </a-form-item>
       <a-form :model="searchValue" layout="inline" autocomplete="off">
-
+        <a-form-item label="文件名" name="filename">
+          <a-input v-model:value="searchValue.filename"/>
+        </a-form-item>
         <a-form-item label="路径" name="path">
           <a-input v-model:value="searchValue.path"/>
         </a-form-item>
@@ -75,6 +77,7 @@
       <a-button-group>
         <a-button type="primary" @click="create">新建对象</a-button>
         <a-button v-if="manageMode"  type="primary" @click="showCollectionModal">添加到集合</a-button>
+        <a-button v-if="manageMode"  type="primary" @click="showAddTagModal">添加标签等信息</a-button>
         <a-popconfirm v-if="manageMode && collection" title="确认移除" @confirm="deleteFromCollection">
           <a-button type="danger">从合集中移除</a-button>
         </a-popconfirm>
@@ -351,6 +354,47 @@
         <vue3VideoPlay ref="player" v-bind="options"/>
       </div>
     </a-modal>
+    <a-modal v-model:visible="addTagsVisible" title="添加标记，注意仅仅是添加" @ok="addTagsOperation" :maskClosable="false" :keyboard="false">
+      <a-form :model="addTagsObject" :label-col="{ style: { width: '150px' } }" :wrapper-col="{ span: 14 }">
+        <a-form-item label="演员">
+          <a-select
+              v-model:value="addTagsObject.actress"
+              mode="multiple"
+              style="width: 100%"
+              :filter-option="filterOption"
+              :options="actressOptions"
+          ></a-select>
+        </a-form-item>
+        <a-form-item label="标签">
+          <a-select
+              v-model:value="addTagsObject.tag"
+              mode="multiple"
+              style="width: 100%"
+              :filter-option="filterOption"
+              :options="tagOptions"
+          ></a-select>
+        </a-form-item>
+        <a-form-item label="分组">
+          <a-tree-select
+              v-model:value="addTagsObject.tree"
+              show-search
+              style="width: 100%"
+              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+              allow-clear
+              multiple
+              :show-checked-strategy="SHOW_ALL"
+              tree-default-expand-all
+              :tree-data="treeOptions"
+          >
+            <template #tagRender="{ label, closable, onClose, option }">
+              <a-tag :closable="closable" :color="option.color" style="margin-right: 3px" @close="onClose">
+                {{ label }}&nbsp;&nbsp;
+              </a-tag>
+            </template>
+          </a-tree-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <a-modal v-model:visible="add2CollectionVisible" title="添加到集合" @ok="add2Collection" :maskClosable="false" :keyboard="false">
       <a-form :label-col="{ style: { width: '150px' } }" :wrapper-col="{ span: 14 }">
         <a-form-item label="集合">
@@ -368,7 +412,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, reactive} from 'vue';
-import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc, randomPath} from "@/api/object";
+import {createObject, deleteObject, listObject, log, playPath, scanObject, updateObject, videoPath, viewinc, randomPath, addTags} from "@/api/object";
 import {DeleteOutlined, EditOutlined, PlaySquareOutlined, PlayCircleOutlined} from '@ant-design/icons-vue';
 import {message, TreeSelect} from 'ant-design-vue';
 import {optionsActress} from "@/api/actress";
@@ -390,6 +434,7 @@ const showImage = ref<string>("thumbnail");
 const videoVisible = ref<boolean>(false);
 const player = ref<any>();
 const add2CollectionVisible = ref<boolean>(false);
+const addTagsVisible = ref<boolean>(false);
 const collectionId = ref<any>('');
 
 const options = reactive({
@@ -469,10 +514,13 @@ const empty = {
 
 const object = ref<any>(empty);
 
+const addTagsObject = ref<any>(empty);
+
 const create = () => {
   visible.value = true;
   modalTitle.value = '添加对象';
   object.value = {...empty};
+  addTagsObject.value = {...empty};
 };
 
 const submit = () => {
@@ -602,6 +650,14 @@ const showCollectionModal = () => {
   add2CollectionVisible.value = true
 }
 
+const showAddTagModal = () => {
+  if (selectedRowKeys.value.length === 0) {
+    message.warning('请选择要添加的对象');
+    return;
+  }
+  addTagsVisible.value = true
+}
+
 const add2Collection = () => {
   if (collectionId.value === '') {
     message.warning('请选择要添加的合集');
@@ -614,6 +670,20 @@ const add2Collection = () => {
   }).then(() => {
     message.success("添加成功");
     add2CollectionVisible.value = false;
+  });
+}
+
+const addTagsOperation = () => {
+  addTags({
+    object_id: selectedRowKeys.value,
+    tags: addTagsObject.value.tag,
+    trees: addTagsObject.value.tree,
+    actresses: addTagsObject.value.actress,
+  }).then(() => {
+    message.success("添加成功");
+    addTagsVisible.value = false;
+    addTagsObject.value = {...empty};
+    refresh();
   });
 }
 
@@ -703,6 +773,7 @@ const sizeChange = (nPage: number, nPageSize: number) => {
 };
 
 const searchValue = ref<any>({
+  filename: '',
   path: '',
   actress: [],
   tag: [],
@@ -714,6 +785,7 @@ const refresh = () => {
   const data = {
     page: page.value,
     page_size: pageSize.value,
+    filename: searchValue.value.filename,
     path: searchValue.value.path,
     actress: searchValue.value.actress,
     tag: searchValue.value.tag,

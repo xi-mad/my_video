@@ -38,6 +38,7 @@ func Register(router *gin.RouterGroup) {
 	router.GET("/video", VideoObject)
 	router.GET("/viewinc", ViewObjectInc)
 	router.GET("/random", RandomObject)
+	router.POST("/addTags", AddTags)
 }
 
 var findLog = list.New()
@@ -195,9 +196,9 @@ func createObject(model CreateObjectModel) (object Object, err error) {
 	if err != nil {
 		return
 	}
-	SaveObjectActress(object.ID, model.Actress)
-	SaveObjectTag(object.ID, model.Tag)
-	SaveObjectTree(object.ID, model.Tree)
+	SaveObjectActress(object.ID, model.Actress, true)
+	SaveObjectTag(object.ID, model.Tag, true)
+	SaveObjectTree(object.ID, model.Tree, true)
 	thumb := Thumbnail{
 		ObjectID:  object.ID,
 		Thumbnail: b64,
@@ -254,9 +255,9 @@ func UpdateObject(c *gin.Context) {
 	}
 
 	err = common.DB.Updates(&object).Error
-	SaveObjectActress(object.ID, model.Actress)
-	SaveObjectTag(object.ID, model.Tag)
-	SaveObjectTree(object.ID, model.Tree)
+	SaveObjectActress(object.ID, model.Actress, true)
+	SaveObjectTag(object.ID, model.Tag, true)
+	SaveObjectTree(object.ID, model.Tree, true)
 	c.JSON(200, common.CommonResultAuto(object, err))
 }
 
@@ -485,4 +486,28 @@ func RandomObject(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, common.CommonResultSuccess(obj))
+}
+
+func AddTags(c *gin.Context) {
+	type AddTagsModel struct {
+		ObjectID  []int `json:"object_id"`
+		Tags      []int `json:"tags"`
+		Trees     []int `json:"trees"`
+		Actresses []int `json:"actresses"`
+	}
+	var model AddTagsModel
+	if err := c.ShouldBindJSON(&model); err != nil {
+		c.JSON(http.StatusOK, common.CommonResultFailed(err))
+		return
+	}
+	if len(model.ObjectID) == 0 {
+		c.JSON(http.StatusOK, common.CommonResultFailed(errors.New("object_id is empty")))
+		return
+	}
+	for _, id := range model.ObjectID {
+		SaveObjectTag(id, model.Tags, false)
+		SaveObjectTree(id, model.Trees, false)
+		SaveObjectActress(id, model.Actresses, false)
+	}
+	c.JSON(http.StatusOK, common.CommonResultSuccess(nil))
 }

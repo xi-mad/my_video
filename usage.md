@@ -3,8 +3,9 @@
 
 ### 下载
 
-在[release](https://github.com/xi-mad/my_video/releases)中下载新版本 my_video_full.rar  
+在[release](https://github.com/xi-mad/my_video/releases)中下载新版本 my_video_win_full.rar  
 下载[mtn](https://moviethumbnail.sourceforge.net/)，这个是生成缩略图的工具
+如果不知道下载哪个，就直接点这个链接就好了：http://downloads.sourceforge.net/moviethumbnail/mtn-200808a-win32.zip
 
 ### 解压
 解压my_video_full.rar到任意目录，比如：D:\soft\my_video\my_video_full  

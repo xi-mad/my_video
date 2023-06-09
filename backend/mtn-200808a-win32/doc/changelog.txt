@@ -1,0 +1,116 @@
+version 200808a
+- release year and month is now used as the version number.
+- fix aspect ratio bugs. mtn now should behave the same as vlc's snapshot.
+- bug: the Video: lines in stderr no longer show input scaling info ( => WxH).
+  scaling info is still shown in the final output image and the info text file.
+  this cannot be fixed easily.
+- add -a aspect_ratio option to override input file's display aspect ratio.
+- add non-seek mode -- slower but more accurate timing.
+  non-seek is good for small time step or small clips.
+- seek or non-seek mode is auto selected and can be overridden by -z or -Z.
+- fix possible extra space char after video size info of previous version.
+- make shot size even. this should fix vertical dots when # of column is odd.
+- output files modified since program start time will not be overwritten.
+- the finding of new shots to evade blank & blur is improved.
+  # of skipped shots should be reduced.
+- negative time step (-s) is removed. it doesn't seem to be useful.
+- previous versions reported # of decoded shots/s; changed to # of final shots/s
+- default info_color, background color, and jpeg quality has been changed.
+
+version 2.45 2008/06/28
+- individual images saved (-I option) now have HH_MM_SS as a part of the suffix
+  (requested by RACER LUPINE (racerlupine)).
+- fix issues with flv files. it should work now. (bug reported by: dragonbook)
+- prefer average bitrate calculated from file_size/duration
+- remove [PAR DAR] from ffmpeg's avcodec_string. this might produce an 
+  extra space char after video size information.
+- skip non key packets when a key frame is difficult to find.
+  this seems to help a lot for files with vorbis audio and files with
+  "warning: first frame is no keyframe".
+- win32 binary: gcc4 is used instead of gcc3
+
+version 2.44 2007/12/05
+- add -N option to save file info to a text file (requested by: azumi23)
+
+version 2.43 2007/11/19
+- add -W option for dont overwrite files
+- fix a bug when a video cant get decoded if we dont decode the first frame, 
+  particularly with mpeg1 files. bug reported by: swmaherl, jake_o
+- a small change to edge detection
+- skip non reference frames -- speed up for files which cant seek accurately
+
+version 2.42 2007/11/15
+- version number is bumped to 2.42. hope that'll sound better. hahahaha.
+  also, i am running out of ideas so updates will be infrequent. helps, 
+  comments, patches, or feature requests are welcomed. :)
+- add -F option to format font color & size
+- add -L option to change locations of text
+- fix a bug finding a key frame
+- fix a bug when parsing command line args
+- cleanup some mess in the code
+- a small change to edge detection
+
+version 0.61 2007/09/06
+- add unicode filename support in windows! console output doesn't work though.
+  you might want to change the font if the default doesn't work.
+- thai quick fix is removed because it's not needed anymore
+- add edge detection (-D option)! doesn't work very well if movies have poor 
+  quility or borders.
+- ignore negative start_time; is this ok?
+- change default minimum height to 150 (-h 150)
+- small modification to blank screen detection
+- there're a lot of changes. hopefully that won't introduce new bugs. :)
+
+version 0.60 2007/08/22
+- windows thai quick fix is only done in thai codepage (874)
+- make -r override -s, so users dont need to use -s 0 anymore
+- add more usage in windows
+- fix -O option with trailing \ in windows
+- convert all tabs in source code to spaces
+- use -mms-bitfields -mcpu=pentium -march=i386 gcc options in windows 
+  according to http://gnuwin32.sourceforge.net/compile.html
+
+version 0.59 2007/08/18
+- quick fix for displaying thai filenames in the output image in windows;
+  need to handle unicode in windows to do this properly
+- add more checks & warnings
+- in windows, change the default to pause before exiting
+- add -P option for dont pause; override -p
+
+version 0.58 2007/08/17
+- guessing duration when unknown should work with dvd's .vob files
+- timestamping is turned off when we need to guess duration
+- add -I option for saving individual shots to separate files
+- add .nut, .ogg to default search
+
+version 0.57 2007/08/08
+- fix program crash when couln't find codec
+- add a few more checks for really short movies
+
+version 0.56 2007/08/07
+- fix timestamp when start_time > 0 to match other programs
+- fix a small memory leak -- there seem to be more leaks, maybe in ffmpeg
+- add seeking by byte
+- try harder to evade blank screens
+- always order info : Audio, Video, Subtitles
+
+version 0.55 2007/08/03
+- remove -d option for decoding # frames after seeking
+
+version 0.54 2007/08/03
+- decode until we get a key frame!
+
+version 0.53 20070802
+- add more checks for command line arguments
+- create output file before processing
+- create output directory if not exist
+
+version 0.52 20070801
+- add -O option
+- fix start_time handling for DVD's .vob files
+
+version 0.51 20070731
+- add -p option
+
+version 0.50 20070731
+- first beta release

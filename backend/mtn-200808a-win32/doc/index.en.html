@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Windows (vers 14 June 2007), see www.w3.org" />
+  <meta name="keywords" content=
+  "movie thumbnailer, mtn, movie thumbnail, movie thumbnail maker, video thumbnailer, video thumbnail, video thumbnail maker, movie screenshots, video screenshots, open source software, GPL, Linux, Windows" />
+
+  <title>movie thumbnailer (mtn)</title>
+</head>
+
+<body>
+  <h2><a href=
+  "http://moviethumbnail.sourceforge.net/index.en.html">movie
+  thumbnailer (mtn)</a></h2>
+
+  <p>movie thumbnailer (mtn) -- saves thumbnails (screenshots) of
+  movie or video files to jpeg files. It uses FFmpeg's libavcodec
+  as its engine, so it supports all popular codecs, e.g. divx h264
+  mpeg1 mpeg2 mp4 vc1 wmv xvid, and formats, e.g. .3gp .avi .dat
+  .mkv .wmv. mtn is open source software. It should run on all
+  operating systems which have gcc, FFmpeg, and GD, for example,
+  Linux and Windows.</p>
+
+  <p>mtn works similar to "<code>mplayer -benchmark -nosound -quiet
+  -zoom -vf scale=420:-3,tile=2:2 -vo jpeg:outdir=. -sstep 60
+  file.avi</code>". but sstep and framestep options didn't work
+  very well for me.</p>
+
+  <p>mtn comes with ABSOLUTELY NO WARRANTY. This is free software,
+  and you are welcome to redistribute it under certain conditions;
+  for details see file gpl-2.0.txt.</p>
+
+  <p>For project information, please visit <a href=
+  "http://sourceforge.net/projects/moviethumbnail/">SourceForge
+  project summary page</a></p>
+
+  <h3>Features:</h3>
+
+  <ul>
+    <li><b>Super fast!</b> Thanks to FFmpeg's libavcodec.</li>
+
+    <li><b>Command line program</b>: can be used on remote
+    connections to co-location servers, or used in scripts.</li>
+
+    <li><b>Batch mode</b>: recursively search directories for movie
+    files.</li>
+
+    <li>Run at lower priority (nice 10 on Linux, idle on Windows)
+    by default. To run at normal priority use -n option.</li>
+
+    <li>Thumbnails are group together in one jpeg file and can be
+    saved individually too (-I option).</li>
+
+    <li>Work fine with <b>Unicode filenames</b> in both Linux &amp;
+    Windows (might need to change the font with -f fontfile).<br />
+    <img src="img/unicode_filename.jpg" width="640" height="206"
+    border="0" alt="file with unicode name" /><br />
+    <br /></li>
+
+    <li><b>Blank screen detection &amp; evasion</b>: so instead of
+    getting blank shots:<br />
+    <img src="img/37084131_b2_s.jpg" width="640" height="395"
+    border="0" alt="like this" />,<br />
+    we can get (with -b 0.6 option):<br />
+    <img src="img/37084131_b.5_s.jpg" width="640" height="395"
+    border="0" alt="this" /><br />
+    <br /></li>
+
+    <li><b>Edge detection &amp; blur evasion</b>: so instead of
+    getting blur (no edge) shots:<br />
+    <img src="img/10000_bc-tlr1_h480_s.jpg" width="640" height=
+    "323" border="0" alt="like this" />,<br />
+    we can get (with -D6 option): (not perfect yet)<br />
+    <img src="img/10000_bc-tlr1_h480_D.jpg" width="640" height=
+    "323" border="0" alt="this" /><br />
+    (trailers taken from <a href=
+    "http://movies.yahoo.com/feature/hdtrailers.html">yahoo</a>,
+    <a href=
+    "http://www.pocketmovies.net/download.php">pocketmovies</a>,
+    <a href=
+    "http://www.gamershell.com/movie_download_archive.html">gamershell</a>
+    <!-- 
+    &amp; <a href=
+    "http://www.microsoft.com/windows/windowsmedia/musicandvideo/hdvideo/contentshowcase.aspx">
+    microsoft</a> -->)</li>
+
+    <li><b>Update mode</b>: (-W option) omits files that already
+    have thumbnails</li>
+
+    <li>Save file info (name, size, length, codecs) to a text file
+    (-N option)</li>
+
+	<li><b>Seek and non-seek mode</b>: automatically selected and can be overridden. (-z and -Z option) Seek mode is much faster while non-seek mode is good for small time step or small clips. <b>*new*</b></li>
+
+    <li>These file formats should be supported: .3gp, .3g2, .asf,
+    .avi, .dat, .divx, .dsm, .evo, .flv, .m1v, .m2ts, .m2v, .m4a,
+    .mj2, .mjpg, .mjpeg, .mkv, .mov, .moov, .mp4, .mpg, .mpeg,
+    .mpv, .nut, .ogg, .ogm, .qt, .swf, .ts, .vob, .wmv, .xvid. I
+    haven't tried them all though. :)</li>
+  </ul>
+
+  <h3>Download &amp; Installation</h3>
+
+  <p>Current version: <b>200808a</b>. What's news? See
+  <a href="changelog.txt">changelog.txt</a>. For older releases,
+  please visit <a href=
+  "http://sourceforge.net/project/showfiles.php?group_id=201133">download
+  page.</a></p>
+
+  <ul>
+    <li>Linux &amp; Others
+
+      <ul>
+        <li><a href=
+        "http://downloads.sourceforge.net/moviethumbnail/mtn-200808a.zip">
+        mtn source code</a>. You'll need <a href=
+        "http://ffmpeg.mplayerhq.hu/">FFmpeg's libraries</a>
+        (libavcodec libavformat libavutil libswscale) and <a href=
+        "http://www.libgd.org/">GD library</a>. Most distributions
+        should have libgd but some dont have libswscale, so you
+        might need to compile FFmpeg and enable libswscale.</li>
+
+        <li>mtn Linux i386 binary: <a href=
+        "http://downloads.sourceforge.net/moviethumbnail/mtn-200808a-linux.tgz">
+        statically linked</a> (include everything), or <a href=
+        "http://downloads.sourceforge.net/moviethumbnail/mtn-200808a.zip">
+        dynamically linked</a> (you need to have the required
+        libraries installed by other means)</li>
+
+        <li>Unicode TrueType font (optional): <a href=
+        "http://www.orwell.ru/download/cyberbit.zip">Bitstream
+        Cyberbit</a> -- has 29,934 glyphs</li>
+      </ul>
+    </li>
+
+    <li>Windows:
+
+      <ul>
+        <li><a href=
+        "http://downloads.sourceforge.net/moviethumbnail/mtn-200808a-win32.zip">
+        mtn Windows binary &amp; dll files &amp; source code</a> --
+        all in one package; <b>get this one</b> if you dont know
+        which one to download :)</li>
+
+        <li>separate packages-- can be upgraded independently.</li>
+
+        <li style="list-style: none; display: inline">
+          <ul>
+            <li><a href=
+            "http://downloads.sourceforge.net/moviethumbnail/mtn-200808a.zip">
+            mtn Windows binary &amp; source code</a></li>
+
+            <li>FFmpeg library dll: you can either use
+
+              <ul>
+                <li><a href=
+                "http://arrozcru.no-ip.org/ffmpeg_builds/shared/ffmpeg-r13712-gpl-lshared-win32.tar.bz2">
+                unofficial build at arrozcru</a> (r13721 or newer) --
+                unicode filenames not supported,</li>
+
+                <li>or <a href=
+                "http://downloads.sourceforge.net/moviethumbnail/ffmpeg-r14005-dll.zip">
+                my smaller &amp; newer build</a> (r14005) which
+                only has features that mtn needs (i.e. no encoding
+                &amp; muxing) plus some <a href=
+                "http://arrozcru.no-ip.org/ffmpeg_forum/viewtopic.php?t=607">
+                patches</a>. The source code can be obtained by:
+                <code>svn checkout
+                svn://svn.mplayerhq.hu/ffmpeg/trunk
+                ffmpeg</code></li>
+              </ul>
+            </li>
+
+            <li><a href=
+            "http://www.libgd.org/releases/oldreleases/gd-2.0.34-win32.zip">
+            GD library dll</a> -- not yet upgradeable; please use
+            this version</li>
+
+            <li>put the dll files in the same directory as mtn.exe
+            (not in bin nor dll sub-directory)</li>
+          </ul>
+        </li>
+
+        <li>GUI</li>
+
+        <li style="list-style: none; display: inline">
+          <ul>
+            <li>Movie 'Batch' Thumbnailer FrontEnd: <a href=
+            "http://downloads.sourceforge.net/moviethumbnail/mtnBatch.v0.1.exe">
+            version 0.1</a> developed by <b>illuminati</b> -- super
+            cool!! :), or</li>
+            <li>Movie Thumbnailer Front-End & source code: <a href=
+            "http://downloads.sourceforge.net/moviethumbnail/mtnFront0.44.zip">
+            version 0.44</a> developed by <b>illuminati</b> -- also super
+            cool!! :)</li>
+
+            <li>put or unzip the GUI in the same directory as mtn.exe</li>
+          </ul>
+        </li>
+
+        <li>Unicode TrueType font (optional): <a href=
+        "http://www.orwell.ru/download/cyberbit.zip">Bitstream
+        Cyberbit</a> -- has 29,934 glyphs</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Usage:</h3>
+
+  <p>mtn is a command-line program so its usage will mostly be done
+  in a shell or command prompt. It has many options, the more
+  frequently used ones are:</p>
+
+  <ul>
+    <li><b><code>-w width</code></b> : width of output image</li>
+
+    <li>If you want the thumbnails to have 3 columns and 10 rows,
+    use: <b><code>-c 3 -r 10</code></b></li>
+
+    <li>Or if you want to have 5 columns and have a shot every 65
+    seconds, use: <b><code>-c 5 -s 65</code></b></li>
+
+    <li><b><code>-r rows</code></b> will override <b><code>-s
+    seconds</code></b> if used together</li>
+
+    <li>If not overridden, the defaults are used: <b><code>-w 1024
+    -c 3 -s 120</code></b></li>
+
+    <li>In Windows, you can run mtn.exe from command prompt or drag
+    files/dirs from Windows explorer and drop them on mtn.exe. You
+    can change the default options by creating a shortcut to
+    mtn.exe and add options there (right click the shortcut -&gt;
+    Properties -&gt; Target); then drop files/dirs on the shortcut
+    instead.</li>
+
+    <li>In Linux &amp; others, you'll probably need to change the
+    TrueType font path (<b><code>-f fontfile</code></b>). The
+    default is set to tahomabd.ttf which might not exist in
+    non-Windows systems. If you dont have a TrueType font, you can
+    turn the text off by using <b><code>-i -t</code></b>.</li>
+
+    <li>Files which have Unicode names, e.g. in Thai Chinese
+    Japanese Korean Greek, do work fine with mtn in both Linux and
+    Windows (as of version 0.61). You need to tell which TrueType
+    font to use though (<b><code>-f fontfile</code></b>).
+    ARIALUNI.TTF and <a href=
+    "http://www.orwell.ru/download/cyberbit.zip">Cyberbit.ttf</a>
+    seem like good ones.</li>
+  </ul>
+
+  <p>For more information, see <b><a href="usage.en.html">detailed
+  usage</a></b>.</p>
+
+  <h3>Support &amp; Contact:</h3>
+
+  <p>mtn is developed by <b>tuit</b> (tuitfun); though most of its
+  magic is done by <a href="http://ffmpeg.mplayerhq.hu/">FFmpeg</a>
+  libraries. For support &amp; contact, please use one of the
+  <a href=
+  "http://sourceforge.net/forum/?group_id=201133">forums</a>.</p>
+
+  <h3>Special Thanks:</h3>
+
+  <ul>
+    <li>Seeders &amp; Trackers: without all those movies, there
+    would be no need for thumbnails. :)</li>
+
+    <li><a href="http://ffmpeg.mplayerhq.hu/">FFmpeg</a>: super
+    fast &amp; wonderful media libraries/players/converters</li>
+
+    <li><a href="http://www.libgd.org/">GD</a>: easy to use image
+    library; great documents &amp; examples!</li>
+
+    <li><a href=
+    "http://arrozcru.no-ip.org/ffmpeg/index.html">FFmpeg Windows
+    Help</a>: building FFmpeg on Windows tutorials &amp; unofficial
+    builds</li>
+
+    <li><a href="http://www.dranger.com/ffmpeg/">An ffmpeg and SDL
+    Tutorial</a></li>
+
+    <li><a href="http://sourceforge.net">SourceForge.net</a></li>
+  </ul>
+
+  <h3>Help needed:</h3>
+
+  <ul>
+    <li>My programming skill is very rusty and i am new to
+    libavcodec, so if you can help, please do! :)</li>
+
+    <li>For bugs &amp; future plans, please see <a href=
+    "todo.txt">todo.txt</a> and the source code.</li>
+
+    <li>I cannot do GUI, if you can help please let me know.</li>
+  </ul>
+
+  <h3>Links:</h3>
+
+  <ul>
+    <li><a href="http://www.xnview.com/">XnView</a> is an efficient
+    multimedia viewer, browser and converter. Highly configurable
+    too!</li>
+
+    <li><a href="http://www.mingw.org/">MinGW</a>: Minimalist GNU
+    for Windows -- compile unix software natively in Windows</li>
+
+    <li><a href="http://www.virtualbox.org/">VirtualBox</a>: x86
+    virtualization products -- run Windows in Linux and vice
+    versa</li>
+
+    <li><a href="http://www.wxwidgets.org/">wxWidgets</a>: a
+    cross-platform GUI toolkit</li>
+
+    <li><a href="http://www45.brinkster.com/antworkz/">Image
+    Grabber</a>: my favorite thumbnail maker when mtn didn't exist
+    :)</li>
+
+	<li><A HREF="http://moitah.net/">MPEG4 Modifier:</A> Modifies MPEG4-ASP AVIs (aspect ratio, userdata, packed bitstream) without re-encoding.</li>
+  </ul>
+
+  <p><a href="http://sourceforge.net"><img src=
+  "http://sflogo.sourceforge.net/sflogo.php?group_id=201133&amp;type=5"
+  width="210" height="62" border="0" alt=
+  "SourceForge.net Logo" /></a></p>
+</body>
+</html>

@@ -1,0 +1,21 @@
+i dont know how to do most of the things here. if you can help, please do!! :)
+http://moviethumbnail.sourceforge.net/
+
+bugs:
+=====
+- seeking in some files doesn't give a key frame. this slows down mtn a lot.
+- how to make text align right?
+- pts calculation might be incorrect
+- is byte seeking working correctly?
+- guess duration when unknown; or when duration is unknown, we'll switch unit
+  from seconds to bytes
+- fix static string buffers
+- fix potential buffer overflow in string handling
+
+future plans:
+=============
+- edge detection doesn't work very well. need a new convolution kernel?
+- use multiple threads
+- make mtn work with dvds -- both real ones and image files
+- make mtn work with blue-ray & hd-dvd
+- GUI! wxWidgets?

@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Windows (vers 14 June 2007), see www.w3.org" />
+  <meta name="keywords" content=
+  "movie thumbnailer, mtn, movie thumbnail, movie thumbnail maker, video thumbnailer, video thumbnail, video thumbnail maker, movie screenshots, video screenshots, open source software, GPL, Linux, Windows" />
+
+  <title>movie thumbnailer (mtn) usage</title>
+</head>
+
+<body>
+  <h2><a href=
+  "http://moviethumbnail.sourceforge.net/index.en.html">movie
+  thumbnailer (mtn)</a> usage</h2>
+  <pre>
+detailed usage:
+  mtn [options] file_or_dir1 [file_or_dir2] ... [file_or_dirn]
+options: (and default values)
+  -a aspect_ratio : override input file's display aspect ratio
+  -b 0.80 : skip if % blank is higher; 0:skip all 1:skip really blank >1:off
+  -B 0.0 : omit this seconds from the beginning
+  -c 3 : # of column
+  -C -1 : cut movie and thumbnails not more than the specified seconds; <=0:off
+  -D 12 : edge detection; 0:off >0:on; higher detects more; try -D4 -D6 or -D8
+  -E 0.0 : omit this seconds at the end
+  -f tahomabd.ttf : font file; use absolute path if not in usual places
+  -F RRGGBB:size[:font:RRGGBB:RRGGBB:size] : font format [time is optional]
+     info_color:info_size[:time_font:time_color:time_shadow:time_size]
+  -g 0 : gap between each shot
+  -h 150 : minimum height of each shot; will reduce # of column to fit
+  -i : info text off
+  -I : save individual shots too
+  -j 90 : jpeg quality
+  -k RRGGBB : background color (in hex)
+  -L info_location[:time_location] : location of text
+     1=lower left, 2=lower right, 3=upper right, 4=upper left
+  -n : run at normal priority
+  -N info_suffix : save info text to a file with suffix
+  -o _s.jpg : output suffix
+  -O directory : save output files in the specified directory
+  -p : pause before exiting; default on in win32
+  -P : dont pause before exiting; override -p
+  -r 0 : # of rows; >0:override -s
+  -s 120 : time step between each shot
+  -t : time stamp off
+  -T text : add text above output image
+  -v : verbose mode (debug)
+  -w 1024 : width of output image; 0:column * movie width
+  -W : dont overwrite existing files, i.e. update mode
+  -z : always use seek mode
+  -Z : always use non-seek mode -- slower but more accurate timing
+examples:
+  to save thumbnails to file infile_s.jpg with default options:
+    mtn infile.avi
+  to change time step to 65 seconds &amp; change total width to 900:
+    mtn -s 65 -w 900 infile.avi
+  to step evenly to get 3 columns x 10 rows:
+    mtn -c 3 -r 10 infile.avi
+  to save output files to writeable directory:
+    mtn -O writeable /read/only/dir/infile.avi
+  to get 2 columns in original movie size:
+    mtn -c 2 -w 0 infile.avi
+  to skip uninteresting shots, try:
+    mtn -D 4 infile.avi
+</pre>
+
+  <p>mtn is a command-line program so its usage will mostly be done
+  in a shell or command prompt. it has many options:</p>
+
+  <ul>
+    <li><b><code>-w width</code></b> : width of output image</li>
+
+    <li>If we want the thumbnails to have 3 columns and 10 rows,
+    use: <b><code>-c 3 -r 10</code></b></li>
+
+    <li>Or if we want to have 5 columns and have a shot every 65
+    seconds, use: <b><code>-c 5 -s 65</code></b></li>
+
+    <li><b><code>-r rows</code></b> will override <b><code>-s
+    seconds</code></b> if used together</li>
+
+    <li>Seeking and other features might not work properly when
+    time step (<b><code>-s seconds</code></b>) is small. We should
+    keep it above 30.</li>
+
+    <li>If not overridden, the defaults are used: <b><code>-w 1024
+    -c 3 -s 120</code></b></li>
+
+    <li>These file formats should be supported: .3gp, .3g2, .asf,
+    .avi, .dat, .divx, .dsm, .evo, .flv, .m1v, .m2ts, .m2v, .m4a,
+    .mj2, .mjpg, .mjpeg, .mkv, .mov, .moov, .mp4, .mpg, .mpeg,
+    .mpv, .nut, .ogg, .ogm, .qt, .swf, .ts, .vob, .wmv, .xvid. I
+    haven't tried them all though. :)</li>
+
+    <li>In Windows, you can run mtn.exe from command prompt or drag
+    files/dirs from Windows explorer and drop them on mtn.exe. You
+    can change the default options by creating a shortcut to
+    mtn.exe and add options there (right click the shortcut -&gt;
+    Properties -&gt; Target); then drop files/dirs on the shortcut
+    instead.</li>
+
+    <li>In Linux &amp; others, you'll probably need to change the
+    TrueType font path (<b><code>-f fontfile</code></b>). The
+    default is set to tahomabd.ttf which might not exist in
+    non-Windows systems. If you dont have a TrueType font, you can
+    turn the text off by using <b><code>-i -t</code></b>.</li>
+
+    <li>Files which have Unicode names, e.g. in Thai Chinese
+    Japanese Korean Greek, do work fine with mtn in both Linux and
+    Windows (as of version 0.61). You need to tell which TrueType
+    font to use though (<b><code>-f fontfile</code></b>).
+    ARIALUNI.TTF and <a href=
+    "http://www.orwell.ru/download/cyberbit.zip">Cyberbit.ttf</a>
+    seem like good ones.<br />
+    <img src="img/unicode_filename.jpg" width="640" height="206"
+    border="0" alt="file with unicode name" /></li>
+
+    <li><b><code>-B seconds</code></b> and <b><code>-E
+    seconds</code></b> can be used to omit the beginning and the
+    end of movies. We dont really want to see those credits, do we?
+    :) Or we might not want to show how a movie ends.</li>
+
+    <li><b><code>-h minheight</code></b> of each shot can be set.
+    mtn will reduce the number of column until each shot meets
+    minheight. For example, lets say we usually want 3 columns
+    like:<br />
+    <img src="img/supremecommander_e32006_s.jpg" width="640"
+    height="371" border="0" alt="this" />,<br />
+    so we'd normally use <b><code>-c 3</code></b>. But when we
+    encouter a wide screen format, thumbnails will come out
+    like:<br />
+    <img src="img/40660182_h1.jpg" width="640" height="229" border=
+    "0" alt="this" />.<br />
+    Oops. Isn't that too tiny? So, with something like <b><code>-h
+    100</code></b>, we'll get:<br />
+    <img src="img/40660182_h100.jpg" width="640" height="450"
+    border="0" alt="this instead" />.<br />
+    Isn't that much nicer? :) Now we can always use <b><code>-c 3
+    -h 100</code></b> and thumbnails will be ok for all aspect
+    ratios.</li>
+
+    <li>Blank screen detection &amp; evasion is enabled with
+    <b><code>-b percent</code></b> -- 100% (1.00) is completely
+    blank, 50% (0.50) is half blank. So, to evade shots which are
+    80% blank, use <b><code>-b 0.80</code></b>. For example,
+    instead of getting blank shots:<br />
+    <img src="img/37084131_b2_s.jpg" width="640" height="395"
+    border="0" alt="like this" />,<br />
+    we can get (with <b><code>-b 0.6</code></b> option):<br />
+    <img src="img/37084131_b.5_s.jpg" width="640" height="395"
+    border="0" alt="this" /><br />
+    After the introduction of edge detection, we might want to use
+    that instead, and leave this at the default value.</li>
+
+    <li>Edge detection &amp; blur evasion is enabled with
+    <b><code>-D number</code></b>. Shots without edges are blur.
+    The higher the number, the more edges mtn will detect. As a
+    result, with higher numbers, slightly blur shots will be more
+    likely to get through. Try <b><code>-D 4</code></b>,
+    <b><code>-D 6</code></b>, or <b><code>-D 8</code></b> and pick
+    the one you like (I like <b><code>-D 6</code></b>). Note that
+    this feature is not perfect yet and it requires blank screen
+    detection. For example, instead of getting blur (no edge)
+    shots:<br />
+    <img src="img/10000_bc-tlr1_h480_s.jpg" width="640" height=
+    "323" border="0" alt="like this" />,<br />
+    we can get (with <b><code>-D 6</code></b> option):<br />
+    <img src="img/10000_bc-tlr1_h480_D.jpg" width="640" height=
+    "323" border="0" alt="this" />.<br />
+    Internally, mtn does something like:<br />
+    <img src="img/10000_bc-tlr1_h480_V.jpg" width="640" height=
+    "323" border="0" alt="this" />.<br />
+    It only detects edges in those grey boxes to speed things
+    up.</li>
+
+    <li><b><code>-k RRGGBB</code></b> (in hex) sets the background
+    color. So, <b><code>-k 0000FF</code></b> would produce a blue
+    background.</li>
+
+    <li><b><code>-L info_location[:time_location]</code></b> can be
+    use to change the locations of the text [time location is
+    optional]. Locations can be 1=lower left, 2=lower right,
+    3=upper right, 4=upper left. So, <b><code>-L 1:3</code></b>
+    would give us:<br />
+    <img src="img/gt_ps_premiere_2007_L1_3.jpg" width="640" height=
+    "231" border="0" alt="this" /></li>
+
+    <li><b><code>-F
+    info_color:info_size[:time_font:time_color:time_shadow:time_size]</code></b>
+    sets the font formats [time format is optional]. The color
+    needs to be in RRGGBB (in hex) format. <b><code>-F
+    FFFF00:10</code></b> gives us:<br />
+    <img src="img/gt_ps_premiere_2007_FFFFF00_10.jpg" width="640"
+    height="236" border="0" alt="this" />.<br />
+    And <b><code>-F
+    FFFF00:8:comicbd.ttf:ff0000:00ff00:12</code></b> gives
+    us:<br />
+    <img src=
+    "img/gt_ps_premiere_2007_FFFFF00_8_comicbd.ttf_ff0000_00ff00_12.jpg"
+    width="640" height="225" border="0" alt="this" />.<br />
+    Please note that only time stamp fontfile is taken from
+    <b><code>-F</code></b>; info text fontfile is still specified
+    by <b><code>-f</code></b>. (trailers taken from <a href=
+    "http://movies.yahoo.com/feature/hdtrailers.html">yahoo</a>,
+    <a href=
+    "http://www.pocketmovies.net/download.php">pocketmovies</a>,
+    <a href=
+    "http://www.gamershell.com/movie_download_archive.html">gamershell</a>)</li>
+
+    <li><b><code>-O directory</code></b> saves output files in the
+    specified directory, which will be created if not exist.
+    Neccessary when the movie files are in read only directories,
+    e.g., CD's/DVD's or mounted image files.</li>
+
+    <li><b><code>-W</code></b> option omits files that already have
+    thumbnails (by checking the existance of the output
+    files).</li>
+
+    <li><b><code>-N info_suffix</code></b> saves file info (name,
+    size, length, codecs) and text given by <b><code>-T
+    text</code></b> to a text file with the specified suffix.</li>
+
+	<li><b><code>-a aspect_ratio</code></b> overrides input file's display aspect ratio (DAR). <b>*new*</b></li>
+
+	<li><b><code>-z</code></b>: always use seek mode, <b><code>-Z</code></b>: always use non-seek mode. Seek mode is much faster but doesn't work very well when time step is small; while non-seek mode is slower but good for small time step or small clips. Normally mtn will automatically use the appropriate mode. When it's not sure which mode it use, it'll use seek mode and print out a message.<b>*new*</b></li>
+  </ul>
+
+  <p><a href="http://sourceforge.net"><img src=
+  "http://sflogo.sourceforge.net/sflogo.php?group_id=201133&amp;type=5"
+  width="210" height="62" border="0" alt=
+  "SourceForge.net Logo" /></a></p>
+</body>
+</html>
